@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
+@org.springframework.context.annotation.Primary
+@org.springframework.beans.factory.annotation.Qualifier("simpleToll")
 public class PlaceholderTollClient implements TollClient {
 
     @Value("${routing.toll.perKm:0.05}")

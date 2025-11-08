@@ -11,6 +11,7 @@ public record ListagemCaminhao(
     Double largura,
     Double altura,
     Double fatorCubagem,
+    Double valorPorKm,
     Double volume,
     Double pesoCubado
 ) {
@@ -26,8 +27,9 @@ public record ListagemCaminhao(
             caminhao.getLargura(),
             caminhao.getAltura(),
             caminhao.getFatorCubagem(),
-            caminhao.getVolume(),
-            caminhao.getPesoCubado()
+            caminhao.getValorPorKm(),
+            caminhao.calcularVolume(),
+            caminhao.calcularPesoCubado()
         );
     }
 }

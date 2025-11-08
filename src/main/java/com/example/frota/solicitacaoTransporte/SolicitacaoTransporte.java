@@ -1,5 +1,6 @@
 package com.example.frota.solicitacaoTransporte;
 
+import com.example.frota.caminhao.Caminhao;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -108,24 +109,31 @@ public class SolicitacaoTransporte {
     }
 
     /**
-     * Volume do produto em m³
+     * Calcula o volume do produto em m³
      */
-    public double getVolume() {
+    public double calcularVolume() {
         return this.comprimento * this.largura * this.altura;
     }
 
     /**
-     * Peso cubado: Volume x Fator de Cubagem
+     * Calcula o peso cubado (Volume x Fator de Cubagem) em kg
      */
-    public double getPesoCubado() {
-        return getVolume() * this.fatorCubagem;
+    public double calcularPesoCubado() {
+        return calcularVolume() * this.fatorCubagem;
     }
 
     /**
-     * Peso considerado para o frete (maior entre peso real e peso cubado)
+     * Calcula o peso considerado para o frete (maior entre peso real e peso cubado)
      */
-    public double getPesoConsiderado() {
-        return Math.max(this.pesoReal, getPesoCubado());
+    public double calcularPesoConsiderado() {
+        return Math.max(this.pesoReal, calcularPesoCubado());
     }
 
+    /**
+     * Valida se o produto cabe no caminhão fornecido
+     */
+    public boolean validarDimensoes(Caminhao caminhao) {
+        return caminhao.podeTransportarPeso(calcularPesoConsiderado()) &&
+               caminhao.podeTransportarVolume(this.comprimento, this.largura, this.altura);
+    }
 }

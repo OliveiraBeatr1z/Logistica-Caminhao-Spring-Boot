@@ -16,7 +16,9 @@ public record CadastroCaminhao(
 	Double largura,
 	Double altura,
 	// opcional, kg/m3
-	Double fatorCubagem) {
+	Double fatorCubagem,
+	// valor por km rodado
+	Double valorPorKm) {
 
 }
 

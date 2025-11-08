@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
  * This implementation focuses on distance and uses the directions endpoint; toll estimation is not provided by default on free tiers.
  */
 @Component
+@org.springframework.beans.factory.annotation.Qualifier("openRoute")
 public class OpenRouteServiceClient implements DistanceClient, TollClient {
 
     @Value("${routing.ors.apiKey:}")

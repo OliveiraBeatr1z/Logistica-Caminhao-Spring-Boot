@@ -29,7 +29,10 @@ public record AtualizacaoCaminhao(
 	    Double largura,
 	    Double altura,
 	    // fator cubagem kg/m3
-	    Double fatorCubagem
+	    Double fatorCubagem,
+	    // valor por km rodado
+	    @Positive(message = "Valor por km deve ser positivo")
+	    Double valorPorKm
 	) {}
 
 

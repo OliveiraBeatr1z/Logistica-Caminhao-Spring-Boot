@@ -34,8 +34,8 @@ public class FreightService {
     public FreightService(
             CaixaPadronizadaRepository caixaRepo, 
             CaminhaoRepository caminhaoRepo,
-            DistanceClient distanceClient, 
-            TollClient tollClient) {
+            @org.springframework.beans.factory.annotation.Qualifier("simpleDistance") DistanceClient distanceClient, 
+            @org.springframework.beans.factory.annotation.Qualifier("simpleToll") TollClient tollClient) {
         this.caixaRepo = caixaRepo;
         this.caminhaoRepo = caminhaoRepo;
         this.distanceClient = distanceClient;
@@ -88,10 +88,10 @@ public class FreightService {
         s.setDistanciaKm(distancia);
 
         // 2. Calcula o peso cubado do produto
-        double pesoCubado = s.getPesoCubado();
+        double pesoCubado = s.calcularPesoCubado();
 
         // 3. Determina o peso considerado (maior entre peso real e peso cubado)
-        double pesoConsiderado = s.getPesoConsiderado();
+        double pesoConsiderado = s.calcularPesoConsiderado();
 
         // 4. Calcula frete por peso
         double custoPorPeso = pesoConsiderado * precoPorKgPorKm * distancia;
@@ -162,8 +162,8 @@ public class FreightService {
             s.getDestinoLon()
         );
 
-        double pesoCubado = s.getPesoCubado();
-        double pesoConsiderado = s.getPesoConsiderado();
+        double pesoCubado = s.calcularPesoCubado();
+        double pesoConsiderado = s.calcularPesoConsiderado();
         double custoPorPeso = pesoConsiderado * precoPorKgPorKm * distancia;
         
         Double custoPorCaixa = null;

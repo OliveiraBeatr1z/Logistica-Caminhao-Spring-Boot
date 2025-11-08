@@ -47,8 +47,20 @@ public class CaminhaoController {
                 .orElseThrow(() -> new EntityNotFoundException("Caminhão não encontrado"));
             dto = caminhaoMapper.toAtualizacaoDto(caminhao);
 		} else {
-			// criação: DTO vazio (novos campos: comprimento, largura, altura, fatorCubagem)
-			dto = new AtualizacaoCaminhao(null, "", "", null, null, null, null, null, null, null);
+			// criação: DTO vazio com valores padrão
+			dto = new AtualizacaoCaminhao(
+				null,           // id
+				"",            // modelo
+				"",            // placa
+				2025,          // ano (atual)
+				0.0,           // cargaMaxima
+				null,          // marcaId
+				0.0,           // comprimento
+				0.0,           // largura
+				0.0,           // altura
+				300.0,         // fatorCubagem padrão
+				0.0            // valorPorKm
+			);
 		}
         model.addAttribute("caminhao", dto);
         model.addAttribute("marcas", marcaService.procurarTodos());

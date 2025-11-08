@@ -64,21 +64,32 @@ public class SolicitacaoController {
     
     @GetMapping("/mostrar/{id}")
     public String mostrarSolicitacaoPorId(@PathVariable("id") Long id, Model model) {
-        SolicitacaoTransporte solicitacao = repository.findById(id).orElse(null);
-        FreightService.DetalheFrete detalhe = solicitacaoService.calcularFreteDetalhado(id);
-        
-        model.addAttribute("solicitacao", solicitacao);
-        model.addAttribute("detalhe", detalhe);
-        
-        // Buscar informações da caixa e caminhão se existirem
-        if (solicitacao.getCaixaId() != null) {
-            model.addAttribute("caixa", caixaService.procurarPorId(solicitacao.getCaixaId()).orElse(null));
+        try {
+            SolicitacaoTransporte solicitacao = solicitacaoService.buscarPorId(id);
+            FreightService.DetalheFrete detalhe = solicitacaoService.calcularFreteDetalhado(id);
+            
+            model.addAttribute("solicitacao", solicitacao);
+            model.addAttribute("detalhe", detalhe);
+            
+            // Buscar informações da caixa e caminhão se existirem
+            if (solicitacao.getCaixaId() != null) {
+                var caixa = caixaService.procurarPorId(solicitacao.getCaixaId());
+                if (caixa != null) {
+                    model.addAttribute("caixa", caixa);
+                }
+            }
+            if (solicitacao.getCaminhaoId() != null) {
+                var caminhao = caminhaoService.procurarPorId(solicitacao.getCaminhaoId());
+                if (caminhao.isPresent()) {
+                    model.addAttribute("caminhao", caminhao.get());
+                }
+            }
+            
+            return "solicitacao/mostrar-detalhe";
+        } catch (RuntimeException e) {
+            model.addAttribute("error", "Solicitação não encontrada: " + e.getMessage());
+            return "redirect:/solicitacoes/mostrar";
         }
-        if (solicitacao.getCaminhaoId() != null) {
-            model.addAttribute("caminhao", caminhaoService.procurarPorId(solicitacao.getCaminhaoId()).orElse(null));
-        }
-        
-        return "solicitacao/mostrar-detalhe";
     }
 
     @PostMapping("/deletar/{id}")
@@ -116,15 +127,12 @@ public class SolicitacaoController {
 class SolicitacaoApiController {
 
     private final FreightService freightService;
-    private final SolicitacaoTransporteRepository repo;
     private final SolicitacaoTransporteService service;
 
     public SolicitacaoApiController(
             FreightService freightService, 
-            SolicitacaoTransporteRepository repo,
             SolicitacaoTransporteService service) {
         this.freightService = freightService;
-        this.repo = repo;
         this.service = service;
     }
 
