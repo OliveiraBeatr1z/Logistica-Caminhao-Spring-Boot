@@ -34,6 +34,27 @@ public class CaixaPadronizada {
     // limite de peso em kg
     private double limitePeso;
 
+    public CaixaPadronizada(DadosCadastroCaixa dados) {
+        this.comprimento = dados.comprimento();
+        this.largura = dados.largura();
+        this.altura = dados.altura();
+        this.material = dados.material();
+        this.limitePeso = dados.limitePeso();
+    }
+
+    public void atualizarInformacoes(DadosAtualizacaoCaixa dados) {
+        if (dados.material() != null)
+            this.material = dados.material();
+        if (dados.comprimento() != null)
+            this.comprimento = dados.comprimento();
+        if (dados.largura() != null)
+            this.largura = dados.largura();
+        if (dados.altura() != null)
+            this.altura = dados.altura();
+        if (dados.limitePeso() != null)
+            this.limitePeso = dados.limitePeso();
+    }
+
     public double getVolume() {
         return comprimento * largura * altura;
     }

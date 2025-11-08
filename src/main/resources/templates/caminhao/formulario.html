@@ -69,14 +69,40 @@
 					 th:classappend="${#fields.hasErrors('ano')} ? 'is-invalid'">
                 <div th:errors="*{ano}" class="invalid-feedback"></div>
 			</div>
-			<div class="form-group">
-				<label for="placa"> Carga Maxima: </label> <input
-					class="form-control" type="number"
-					th:field="*{cargaMaxima}"
-					th:classappend="${#fields.hasErrors('cargaMaxima')} ? 'is-invalid'">
-                <div th:errors="*{cargaMaxima}" class="invalid-feedback"></div>
+		<div class="form-group">
+			<label for="placa"> Carga Maxima: </label> <input
+				class="form-control" type="number"
+				th:field="*{cargaMaxima}"
+				th:classappend="${#fields.hasErrors('cargaMaxima')} ? 'is-invalid'">
+            <div th:errors="*{cargaMaxima}" class="invalid-feedback"></div>
+		</div>
+		
+		<h4 class="mt-4">Dimensões do Caminhão (em metros)</h4>
+		<div class="form-row">
+			<div class="form-group col-md-4">
+				<label for="comprimento">Comprimento (m):</label>
+				<input type="number" step="0.01" class="form-control" id="comprimento" 
+				       th:field="*{comprimento}">
 			</div>
-			
+			<div class="form-group col-md-4">
+				<label for="largura">Largura (m):</label>
+				<input type="number" step="0.01" class="form-control" id="largura" 
+				       th:field="*{largura}">
+			</div>
+			<div class="form-group col-md-4">
+				<label for="altura">Altura (m):</label>
+				<input type="number" step="0.01" class="form-control" id="altura" 
+				       th:field="*{altura}">
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label for="fatorCubagem">Fator de Cubagem (kg/m³):</label>
+			<input type="number" step="0.01" class="form-control" id="fatorCubagem" 
+			       th:field="*{fatorCubagem}" placeholder="300.0">
+			<small class="form-text text-muted">Padrão para transporte rodoviário: 300 kg/m³</small>
+		</div>
+		
 			<button type="submit" class="btn btn-primary">
                 <span th:text="${caminhao.id != null} ? 'Atualizar' : 'Cadastrar'"></span>
             </button>
