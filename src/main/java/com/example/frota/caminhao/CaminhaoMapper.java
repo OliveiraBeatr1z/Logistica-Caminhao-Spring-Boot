@@ -13,16 +13,28 @@ public interface CaminhaoMapper {
     
     // Converte Entity para DTO (para preencher formulário de edição)
     @Mapping(target = "marcaId", source = "marca.id")
+    @Mapping(target = "comprimento", source = "comprimento")
+    @Mapping(target = "largura", source = "largura")
+    @Mapping(target = "altura", source = "altura")
+    @Mapping(target = "fatorCubagem", source = "fatorCubagem")
     AtualizacaoCaminhao toAtualizacaoDto(Caminhao caminhao);
     
     // Converte DTO para Entity (para criação NOVA - ignora ID)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "marca", source = "marcaId", qualifiedByName = "idToMarca")
+    @Mapping(target = "comprimento", source = "comprimento")
+    @Mapping(target = "largura", source = "largura")
+    @Mapping(target = "altura", source = "altura")
+    @Mapping(target = "fatorCubagem", source = "fatorCubagem")
     Caminhao toEntityFromAtualizacao(AtualizacaoCaminhao dto);
     
     // Atualiza Entity existente com dados do DTO
     @Mapping(target = "id", ignore = true) // Não atualiza ID
     @Mapping(target = "marca", source = "marcaId", qualifiedByName = "idToMarca")
+    @Mapping(target = "comprimento", source = "comprimento")
+    @Mapping(target = "largura", source = "largura")
+    @Mapping(target = "altura", source = "altura")
+    @Mapping(target = "fatorCubagem", source = "fatorCubagem")
     void updateEntityFromDto(AtualizacaoCaminhao dto, @MappingTarget Caminhao caminhao);
     
     // Método para converter marcaId em objeto Marca
@@ -34,3 +46,4 @@ public interface CaminhaoMapper {
         return marca;
     }
 }
+

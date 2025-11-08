@@ -16,7 +16,7 @@
 				<span aria-hidden="true">&times;</span>
 			</button>
 		</div>
-    <a href="/caminhao/formulario">Novo</a>
+    <a href="/caminhao/formulario" class="btn btn-primary mb-3">Novo Caminhão</a>
     <div th:if="${listaVeiculos.size() > 0}">
 	    <table class="table table-hover table-responsive-xl">
 	        <thead class="thead-light">
@@ -24,7 +24,9 @@
 	                <th scope="col">Modelo</th>
 	                <th scope="col">Placa</th>
 	                <th scope="col">Ano</th>
-	                <th scope="col">CargMax</th>
+	                <th scope="col">CargMax (kg)</th>
+	                <th scope="col">Dimensões (m)</th>
+	                <th scope="col">Volume (m³)</th>
 	                <th scope="col">Marca</th>
 	                <th scope="col">Ações</th>
 	            </tr>
@@ -34,25 +36,39 @@
 	                <td th:text="${caminhao.modelo}"></td>
 	                <td th:text="${caminhao.placa}"></td>
 	                <td th:text="${caminhao.ano}"></td>
-	                <td th:text="${caminhao.cargaMaxima}"></td>
+	                <td th:text="${#numbers.formatDecimal(caminhao.cargaMaxima, 1, 2)}"></td>
+	                <td>
+	                    <span th:if="${caminhao.comprimento != null and caminhao.comprimento > 0}"
+	                          th:text="${#numbers.formatDecimal(caminhao.comprimento, 1, 2)} + ' x ' + 
+	                                   ${#numbers.formatDecimal(caminhao.largura, 1, 2)} + ' x ' + 
+	                                   ${#numbers.formatDecimal(caminhao.altura, 1, 2)}">
+	                    </span>
+	                    <span th:unless="${caminhao.comprimento != null and caminhao.comprimento > 0}">-</span>
+	                </td>
+	                <td>
+	                    <span th:if="${caminhao.comprimento != null and caminhao.comprimento > 0}"
+	                          th:text="${#numbers.formatDecimal(caminhao.volume, 1, 3)}">
+	                    </span>
+	                    <span th:unless="${caminhao.comprimento != null and caminhao.comprimento > 0}">-</span>
+	                </td>
 	                <td th:text="${caminhao.marca.nome}"></td>
 	               
-						<!-- <a th:href="@{/caminhao/formulario?id={id}(id=${caminhao.id})}"><button>Editar</button></a> 
-						<form action="/caminhao" method="post">
-							<input type="hidden" name="_method" value="delete">
-							<input type="hidden" name="id" th:value="${caminhao.id}">
-							<input type="submit" value="Excluir">
-						</form> -->
-						
-						
-					<td><a th:href="@{'/caminhao/formulario/' + ${caminhao.id}}"
-							title="Editar o Caminhao"
-							class="fa-regular fa-pen-to-square icon-dark"></a> &nbsp; <a
-							th:href="@{'/caminhao/delete/' + ${caminhao.id}}"
-							th:caminhaoTitle="${caminhao.placa}" id="btnDelete"
-							title="Apague este caminhao"
-							class="fa-regular fa-trash-can icon-dark btn-delete"></a>
-					</td>
+					<!-- <a th:href="@{/caminhao/formulario?id={id}(id=${caminhao.id})}"><button>Editar</button></a> 
+					<form action="/caminhao" method="post">
+						<input type="hidden" name="_method" value="delete">
+						<input type="hidden" name="id" th:value="${caminhao.id}">
+						<input type="submit" value="Excluir">
+					</form> -->
+					
+					
+				<td><a th:href="@{'/caminhao/formulario/' + ${caminhao.id}}"
+						title="Editar o Caminhao"
+						class="fa-regular fa-pen-to-square icon-dark"></a> &nbsp; <a
+						th:href="@{'/caminhao/delete/' + ${caminhao.id}}"
+						th:caminhaoTitle="${caminhao.placa}" id="btnDelete"
+						title="Apague este caminhao"
+						class="fa-regular fa-trash-can icon-dark btn-delete"></a>
+				</td>
 	            </tr>
 	        </tbody>
 	    </table>
