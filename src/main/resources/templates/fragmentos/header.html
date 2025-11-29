@@ -1,8 +1,10 @@
 <!-- templates/fragmentos/header.html -->
 <header th:fragment="header(activePage)">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-frotalux">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#"> <i class="fas fa-truck me-2"></i>FrotaLux </a>
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-truck-moving"></i> FrotaLux
+            </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -10,85 +12,55 @@
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <!-- Início -->
+                    <!-- Dashboard -->
                     <li class="nav-item">
                         <a class="nav-link" th:classappend="${activePage == 'dashboard'} ? 'active' : ''"
-                           th:href="@{/home/dashboard}">
-                            <i class="fas fa-home me-1"></i> Início
+                           th:href="@{/dashboard}">
+                            <i class="fas fa-chart-line me-1"></i> Dashboard
                         </a>
                     </li>
 
-                    <!-- Dropdown Caminhões -->
+                    <!-- Dropdown Entregas -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="caminhaoDropdown"
-                           role="button" data-bs-toggle="dropdown" aria-expanded="false"
-                           th:classappend="${activePage == 'caminhao'} ? 'active' : ''"
-                           style="cursor: pointer;">
-                            <i class="fas fa-truck me-1"></i> Caminhões
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="caminhaoDropdown">
-                            <li><a class="dropdown-item" th:href="@{/caminhao}">
-                                <i class="fas fa-list me-1"></i> Listar Caminhões</a>
-                            </li>
-                            <li><a class="dropdown-item" th:href="@{/caminhao/formulario}">
-                                <i class="fas fa-plus me-1"></i> Cadastrar Caminhão</a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <!-- Dropdown Motoristas -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="motoristaDropdown"
-                           role="button" data-bs-toggle="dropdown" aria-expanded="false"
-                           th:classappend="${activePage == 'Motorista'} ? 'active' : ''"
-                           style="cursor: pointer;">
-                            <i class="fas fa-user-tie me-1"></i> Motoristas
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="motoristaDropdown">
-                            <li><a class="dropdown-item" th:href="@{/motoristas/mostrar}">
-                                <i class="fas fa-list me-1"></i> Listar Motoristas</a>
-                            </li>
-                            <li><a class="dropdown-item" th:href="@{/motoristas/cadastrar}">
-                                <i class="fas fa-user-plus me-1"></i> Cadastrar Motorista</a>
-                            </li>
-                            <li><a class="dropdown-item" th:href="@{/motoristas/disponiveis}">
-                                <i class="fas fa-check-circle me-1"></i> Motoristas Disponíveis</a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <!-- Dropdown Caixas -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="caixaDropdown"
-                           role="button" data-bs-toggle="dropdown" aria-expanded="false"
-                           th:classappend="${activePage == 'Caixa'} ? 'active' : ''"
-                           style="cursor: pointer;">
-                            <i class="fas fa-box me-1"></i> Caixas
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="caixaDropdown">
-                            <li><a class="dropdown-item" th:href="@{/caixas/mostrar}">
-                                <i class="fas fa-list me-1"></i> Listar Caixas</a>
-                            </li>
-                            <li><a class="dropdown-item" th:href="@{/caixas/cadastrar}">
-                                <i class="fas fa-plus me-1"></i> Cadastrar Caixa</a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <!-- Dropdown Solicitações -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="solicitacaoDropdown"
+                        <a class="nav-link dropdown-toggle" id="entregasDropdown"
                            role="button" data-bs-toggle="dropdown" aria-expanded="false"
                            th:classappend="${activePage == 'Solicitacao'} ? 'active' : ''"
                            style="cursor: pointer;">
                             <i class="fas fa-shipping-fast me-1"></i> Entregas
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="solicitacaoDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="entregasDropdown">
                             <li><a class="dropdown-item" th:href="@{/solicitacoes/mostrar}">
-                                <i class="fas fa-list me-1"></i> Listar Solicitações</a>
+                                <i class="fas fa-list me-2"></i> Listar Solicitações</a>
                             </li>
                             <li><a class="dropdown-item" th:href="@{/solicitacoes/cadastrar}">
-                                <i class="fas fa-plus me-1"></i> Nova Solicitação</a>
+                                <i class="fas fa-plus me-2"></i> Nova Solicitação</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Dropdown Frota -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="frotaDropdown"
+                           role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                           th:classappend="${activePage == 'caminhao' or activePage == 'Motorista'} ? 'active' : ''"
+                           style="cursor: pointer;">
+                            <i class="fas fa-truck me-1"></i> Frota
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="frotaDropdown">
+                            <li><h6 class="dropdown-header">Caminhões</h6></li>
+                            <li><a class="dropdown-item" th:href="@{/caminhao}">
+                                <i class="fas fa-list me-2"></i> Listar Caminhões</a>
+                            </li>
+                            <li><a class="dropdown-item" th:href="@{/caminhao/formulario}">
+                                <i class="fas fa-plus me-2"></i> Cadastrar Caminhão</a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Motoristas</h6></li>
+                            <li><a class="dropdown-item" th:href="@{/motoristas/mostrar}">
+                                <i class="fas fa-users me-2"></i> Listar Motoristas</a>
+                            </li>
+                            <li><a class="dropdown-item" th:href="@{/motoristas/cadastrar}">
+                                <i class="fas fa-user-plus me-2"></i> Cadastrar Motorista</a>
                             </li>
                         </ul>
                     </li>
@@ -102,14 +74,14 @@
                             <i class="fas fa-tools me-1"></i> Manutenção
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="manutencaoDropdown">
-                            <li><a class="dropdown-item" th:href="@{/manutencoes/mostrar}">
-                                <i class="fas fa-history me-1"></i> Histórico</a>
-                            </li>
                             <li><a class="dropdown-item" th:href="@{/manutencoes/alertas}">
-                                <i class="fas fa-exclamation-triangle me-1"></i> Alertas</a>
+                                <i class="fas fa-exclamation-triangle me-2"></i> Alertas</a>
+                            </li>
+                            <li><a class="dropdown-item" th:href="@{/manutencoes/mostrar}">
+                                <i class="fas fa-history me-2"></i> Histórico</a>
                             </li>
                             <li><a class="dropdown-item" th:href="@{/manutencoes/cadastrar}">
-                                <i class="fas fa-plus me-1"></i> Registrar Manutenção</a>
+                                <i class="fas fa-plus me-2"></i> Registrar Manutenção</a>
                             </li>
                         </ul>
                     </li>
@@ -118,13 +90,49 @@
                     <li class="nav-item">
                         <a class="nav-link" th:classappend="${activePage == 'Otimizacao'} ? 'active' : ''"
                            th:href="@{/otimizacao}">
-                            <i class="fas fa-chart-line me-1"></i> Otimização
+                            <i class="fas fa-chart-pie me-1"></i> Otimização
+                        </a>
+                    </li>
+
+                    <!-- Caixas -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${activePage == 'Caixa'} ? 'active' : ''"
+                           th:href="@{/caixas/mostrar}">
+                            <i class="fas fa-box me-1"></i> Caixas
                         </a>
                     </li>
                 </ul>
 
-                <div class="d-flex align-items-center">
-                    <!-- User dropdown placeholder -->
+                <!-- Busca Rápida -->
+                <form class="d-flex me-3" role="search">
+                    <input class="form-control form-control-sm me-2" type="search" 
+                           placeholder="Buscar..." aria-label="Buscar" style="width: 200px;">
+                    <button class="btn btn-outline-light btn-sm" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+
+                <!-- Notificações -->
+                <div class="dropdown me-3">
+                    <button class="btn btn-link text-white position-relative" type="button" 
+                            id="notificationsDropdown" data-bs-toggle="dropdown">
+                        <i class="fas fa-bell fa-lg"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            3
+                            <span class="visually-hidden">notificações não lidas</span>
+                        </span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                        <li><h6 class="dropdown-header">Notificações</h6></li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="fas fa-exclamation-triangle text-warning me-2"></i> 2 alertas de manutenção</a>
+                        </li>
+                        <li><a class="dropdown-item" href="#">
+                            <i class="fas fa-truck text-info me-2"></i> 3 entregas a caminho</a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-center small" href="#">Ver todas</a></li>
+                    </ul>
                 </div>
             </div>
         </div>

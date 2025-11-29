@@ -3,85 +3,155 @@
 <head th:replace="~{fragmentos/head :: head('Motoristas')}"></head>
 <body>
     <header th:replace="~{fragmentos/header :: header(activePage='Motorista')}"></header>
-    <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
-            <h2 th:text="${titulo != null ? titulo : 'Lista de Motoristas'}">Lista de Motoristas</h2>
-            <a th:href="@{/motoristas/cadastrar}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Novo Motorista
+    
+    <div class="container-fluid py-4">
+        <!-- Cabeçalho -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-1">
+                    <i class="fas fa-users text-primary-blue"></i> 
+                    <span th:text="${titulo != null ? titulo : 'Motoristas'}"></span>
+                </h2>
+                <p class="text-secondary-gray mb-0">Gerenciamento da equipe de motoristas</p>
+            </div>
+            <a th:href="@{/motoristas/cadastrar}" class="btn btn-corporate btn-corporate-primary">
+                <i class="fas fa-user-plus"></i> Novo Motorista
             </a>
         </div>
         
-        <div class="mb-3">
-            <a th:href="@{/motoristas/mostrar}" class="btn btn-outline-secondary btn-sm">Todos</a>
-            <a th:href="@{/motoristas/disponiveis}" class="btn btn-outline-success btn-sm">Disponíveis</a>
+        <!-- Filtros -->
+        <div class="mb-4">
+            <div class="btn-group" role="group">
+                <a th:href="@{/motoristas/mostrar}" 
+                   class="btn btn-outline-primary">
+                    <i class="fas fa-list"></i> Todos
+                </a>
+                <a th:href="@{/motoristas/disponiveis}" 
+                   class="btn btn-outline-success">
+                    <i class="fas fa-check-circle"></i> Disponíveis
+                </a>
+            </div>
         </div>
 
-        <div th:if="${motoristas.isEmpty()}" class="alert alert-info">
-            Nenhum motorista cadastrado.
+        <!-- Alerta se vazio -->
+        <div th:if="${motoristas.isEmpty()}" class="alert alert-modern alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            Nenhum motorista cadastrado. Clique em "Novo Motorista" para adicionar.
         </div>
 
-        <div th:if="${!motoristas.isEmpty()}" class="table-responsive">
-            <table class="table table-hover table-striped">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>CPF</th>
-                        <th>CNH</th>
-                        <th>Categoria</th>
-                        <th>Validade CNH</th>
-                        <th>Status</th>
-                        <th>CNH Válida</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="motorista : ${motoristas}">
-                        <td th:text="${motorista.id()}"></td>
-                        <td th:text="${motorista.nome()}"></td>
-                        <td th:text="${motorista.cpf()}"></td>
-                        <td th:text="${motorista.cnh()}"></td>
-                        <td th:text="${motorista.categoriaCnh()}"></td>
-                        <td th:text="${#temporals.format(motorista.validadeCnh(), 'dd/MM/yyyy')}"></td>
-                        <td>
-                            <span th:if="${motorista.ativo()}" class="badge badge-success">Ativo</span>
-                            <span th:if="${!motorista.ativo()}" class="badge badge-secondary">Inativo</span>
-                        </td>
-                        <td>
-                            <span th:if="${motorista.cnhValida()}" class="badge badge-success">Válida</span>
-                            <span th:if="${!motorista.cnhValida()}" class="badge badge-danger">Vencida</span>
-                        </td>
-                        <td>
-                            <a th:href="@{/motoristas/mostrar/{id}(id=${motorista.id()})}" 
-                               class="btn btn-info btn-sm">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a th:href="@{/motoristas/atualizar/{id}(id=${motorista.id()})}" 
-                               class="btn btn-warning btn-sm">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <form th:action="@{/motoristas/inativar/{id}(id=${motorista.id()})}" 
-                                  method="post" style="display: inline;">
-                                <button type="submit" class="btn btn-secondary btn-sm"
-                                        th:if="${motorista.ativo()}"
-                                        onclick="return confirm('Deseja inativar este motorista?')">
-                                    <i class="fas fa-ban"></i>
-                                </button>
-                            </form>
-                            <form th:action="@{/motoristas/deletar/{id}(id=${motorista.id()})}" 
-                                  method="post" style="display: inline;">
-                                <button type="submit" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Tem certeza que deseja excluir?')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Tabela de Motoristas -->
+        <div th:if="${!motoristas.isEmpty()}" class="card-modern">
+            <div class="card-header">
+                <i class="fas fa-table"></i> Lista de Motoristas
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>CPF</th>
+                                <th>CNH</th>
+                                <th>Categoria</th>
+                                <th>Validade CNH</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">CNH Válida</th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="motorista : ${motoristas}">
+                                <td>
+                                    <strong th:text="${motorista.id()}"></strong>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong th:text="${motorista.nome()}"></strong><br>
+                                        <small class="text-secondary-gray" th:if="${motorista.telefone() != null}">
+                                            <i class="fas fa-phone fa-xs"></i> <span th:text="${motorista.telefone()}"></span>
+                                        </small>
+                                    </div>
+                                </td>
+                                <td th:text="${motorista.cpf()}"></td>
+                                <td th:text="${motorista.cnh()}"></td>
+                                <td>
+                                    <span class="badge badge-modern" style="background: #64748b; color: white;">
+                                        <span th:text="${motorista.categoriaCnh()}"></span>
+                                    </span>
+                                </td>
+                                <td th:text="${#temporals.format(motorista.validadeCnh(), 'dd/MM/yyyy')}"></td>
+                                <td class="text-center">
+                                    <span th:if="${motorista.ativo()}" 
+                                          class="badge badge-modern" 
+                                          style="background: #10b981; color: white;">
+                                        <i class="fas fa-check-circle"></i> Ativo
+                                    </span>
+                                    <span th:if="${!motorista.ativo()}" 
+                                          class="badge badge-modern" 
+                                          style="background: #64748b; color: white;">
+                                        <i class="fas fa-ban"></i> Inativo
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span th:if="${motorista.cnhValida()}" 
+                                          class="badge badge-modern badge-cnh-valida">
+                                        <i class="fas fa-check"></i> Válida
+                                    </span>
+                                    <span th:if="${!motorista.cnhValida()}" 
+                                          class="badge badge-modern badge-cnh-vencida">
+                                        <i class="fas fa-exclamation-triangle"></i> Vencida
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a th:href="@{/motoristas/mostrar/{id}(id=${motorista.id()})}" 
+                                           class="btn btn-sm btn-outline-info"
+                                           data-bs-toggle="tooltip" 
+                                           title="Ver detalhes">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a th:href="@{/motoristas/atualizar/{id}(id=${motorista.id()})}" 
+                                           class="btn btn-sm btn-outline-warning"
+                                           data-bs-toggle="tooltip" 
+                                           title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button"
+                                                th:if="${motorista.ativo()}"
+                                                class="btn btn-sm btn-outline-secondary"
+                                                data-bs-toggle="tooltip" 
+                                                title="Inativar"
+                                                th:onclick="'if(confirm(\'Deseja inativar este motorista?\')) { document.getElementById(\'form-inativar-' + ${motorista.id()} + '\').submit(); }'">
+                                            <i class="fas fa-ban"></i>
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-danger"
+                                                data-bs-toggle="tooltip" 
+                                                title="Excluir"
+                                                th:onclick="'if(confirm(\'Tem certeza que deseja excluir este motorista?\')) { document.getElementById(\'form-deletar-' + ${motorista.id()} + '\').submit(); }'">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Forms ocultos para POST -->
+                                    <form th:id="'form-inativar-' + ${motorista.id()}"
+                                          th:action="@{/motoristas/inativar/{id}(id=${motorista.id()})}" 
+                                          method="post" style="display: none;">
+                                    </form>
+                                    <form th:id="'form-deletar-' + ${motorista.id()}"
+                                          th:action="@{/motoristas/deletar/{id}(id=${motorista.id()})}" 
+                                          method="post" style="display: none;">
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
+
     <div th:replace="~{fragmentos/footer :: footer}"></div>
 </body>
 </html>
-

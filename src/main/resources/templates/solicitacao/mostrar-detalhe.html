@@ -3,110 +3,237 @@
 <head th:replace="~{fragmentos/head :: head('Detalhes da Solicitação')}"></head>
 <body>
     <header th:replace="~{fragmentos/header :: header(activePage='Solicitacao')}"></header>
-    <div class="container-fluid" style="max-width: 1000px; margin: 0 auto;">
-        <h2 class="text-center">Detalhes da Solicitação de Transporte</h2>
-        
-        <div class="card mt-4">
-            <div class="card-header bg-primary text-white">
-                <h4>Solicitação #<span th:text="${solicitacao.id}"></span> - <span th:text="${solicitacao.produto}"></span></h4>
+    
+    <div class="container-fluid py-4" style="max-width: 1200px; margin: 0 auto;">
+        <!-- Título e Badge de Status -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-1">
+                    <i class="fas fa-file-alt text-primary-blue"></i> 
+                    Solicitação #<span th:text="${solicitacao.id}"></span>
+                </h2>
+                <p class="text-secondary-gray mb-0" th:text="${solicitacao.produto}"></p>
             </div>
-            <div class="card-body">
-                <h5>Informações do Produto</h5>
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Produto:</strong> <span th:text="${solicitacao.produto}"></span></p>
-                        <p><strong>Peso Real:</strong> <span th:text="${#numbers.formatDecimal(solicitacao.pesoReal, 1, 2)} + ' kg'"></span></p>
-                        <p><strong>Peso Cubado:</strong> <span th:text="${detalhe != null ? #numbers.formatDecimal(detalhe.pesoCubado, 1, 2) + ' kg' : '-'}"></span></p>
-                        <p><strong>Peso Considerado:</strong> 
-                            <span class="badge badge-warning" th:text="${detalhe != null ? #numbers.formatDecimal(detalhe.pesoConsiderado, 1, 2) + ' kg' : '-'}"></span>
-                        </p>
+            <div>
+                <span class="badge badge-modern" 
+                      th:if="${solicitacao.status != null}"
+                      th:classappend="${'badge-status-' + #strings.toLowerCase(solicitacao.status.name())}"
+                      style="font-size: 1rem; padding: 0.5rem 1rem;">
+                    <span th:text="${solicitacao.status.nome}"></span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Botão de Rastreamento -->
+        <div class="mb-4">
+            <a th:href="@{/rastreamento/{id}(id=${solicitacao.id})}" 
+               class="btn btn-corporate btn-corporate-primary btn-lg">
+                <i class="fas fa-map-marked-alt"></i> Rastrear Entrega
+            </a>
+        </div>
+
+        <div class="row">
+            <!-- Coluna Principal -->
+            <div class="col-lg-8 mb-4">
+                <!-- Informações do Produto -->
+                <div class="card-modern mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-cube"></i> Informações do Produto
                     </div>
-                    <div class="col-md-6">
-                        <p><strong>Dimensões (C x L x A):</strong> 
-                            <span th:text="${#numbers.formatDecimal(solicitacao.comprimento, 1, 2)} + ' x ' + 
-                                          ${#numbers.formatDecimal(solicitacao.largura, 1, 2)} + ' x ' + 
-                                          ${#numbers.formatDecimal(solicitacao.altura, 1, 2)} + ' m'"></span>
-                        </p>
-                        <p><strong>Volume:</strong> 
-                            <span th:text="${#numbers.formatDecimal(solicitacao.volume, 1, 4)} + ' m³'"></span>
-                        </p>
-                    </div>
-                </div>
-                
-                <hr/>
-                <h5>Origem e Destino</h5>
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Origem:</strong> <span th:text="${solicitacao.origemEndereco}"></span></p>
-                        <p><small>Coordenadas: <span th:text="${solicitacao.origemLat} + ', ' + ${solicitacao.origemLon}"></span></small></p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>Destino:</strong> <span th:text="${solicitacao.destinoEndereco}"></span></p>
-                        <p><small>Coordenadas: <span th:text="${solicitacao.destinoLat} + ', ' + ${solicitacao.destinoLon}"></span></small></p>
-                    </div>
-                </div>
-                
-                <hr/>
-                <h5>Cálculo do Frete</h5>
-                <div class="row" th:if="${detalhe != null}">
-                    <div class="col-md-6">
-                        <p><strong>Distância:</strong> <span th:text="${#numbers.formatDecimal(detalhe.distanciaKm, 1, 2)} + ' km'"></span></p>
-                        <p><strong>Custo por Peso:</strong> <span th:text="'R$ ' + ${#numbers.formatDecimal(detalhe.custoPorPeso, 1, 2)}"></span></p>
-                        <p><strong>Custo por Caixa:</strong> <span th:text="${detalhe.custoPorCaixa != null ? 'R$ ' + #numbers.formatDecimal(detalhe.custoPorCaixa, 1, 2) : 'N/A'}"></span></p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>Custo Base:</strong> <span th:text="'R$ ' + ${#numbers.formatDecimal(detalhe.custoBase, 1, 2)}"></span></p>
-                        <p><strong>Custo Km Rodado:</strong> <span th:text="'R$ ' + ${#numbers.formatDecimal(detalhe.custoKmRodado, 1, 2)}"></span></p>
-                        <p><strong>Pedágio:</strong> <span th:text="'R$ ' + ${#numbers.formatDecimal(detalhe.valorPedagio, 1, 2)}"></span></p>
-                    </div>
-                </div>
-                
-                <div class="alert alert-success text-center mt-3">
-                    <h4><strong>Valor Total do Frete:</strong> 
-                        <span th:text="${solicitacao.valorFrete != null ? 'R$ ' + #numbers.formatDecimal(solicitacao.valorFrete, 1, 2) : 'Não calculado'}"></span>
-                    </h4>
-                </div>
-                
-                <hr/>
-                <h5>Recursos Utilizados</h5>
-                <div class="row">
-                    <div class="col-md-6" th:if="${caixa != null}">
-                        <div class="card">
-                            <div class="card-body">
-                                <h6 class="card-title">Caixa Utilizada</h6>
-                                <p><strong>Material:</strong> <span th:text="${caixa.material}"></span></p>
-                                <p><strong>Dimensões:</strong> 
-                                    <span th:text="${#numbers.formatDecimal(caixa.comprimento, 1, 2)} + ' x ' + 
-                                                  ${#numbers.formatDecimal(caixa.largura, 1, 2)} + ' x ' + 
-                                                  ${#numbers.formatDecimal(caixa.altura, 1, 2)} + ' m'"></span>
-                                </p>
-                                <p><strong>Limite de Peso:</strong> <span th:text="${#numbers.formatDecimal(caixa.limitePeso, 1, 2)} + ' kg'"></span></p>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-secondary-gray">Produto:</span>
+                                    <strong th:text="${solicitacao.produto}"></strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-secondary-gray">Peso Real:</span>
+                                    <strong th:text="${#numbers.formatDecimal(solicitacao.pesoReal, 1, 2)} + ' kg'"></strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-secondary-gray">Peso Cubado:</span>
+                                    <strong th:text="${detalhe != null ? #numbers.formatDecimal(detalhe.pesoCubado, 1, 2) + ' kg' : '-'}"></strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-secondary-gray">Peso Considerado:</span>
+                                    <span class="badge badge-modern badge-status-processamento" 
+                                          th:text="${detalhe != null ? #numbers.formatDecimal(detalhe.pesoConsiderado, 1, 2) + ' kg' : '-'}"></span>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6" th:if="${caminhao != null}">
-                        <div class="card">
-                            <div class="card-body">
-                                <h6 class="card-title">Caminhão Utilizado</h6>
-                                <p><strong>Modelo:</strong> <span th:text="${caminhao.modelo}"></span></p>
-                                <p><strong>Placa:</strong> <span th:text="${caminhao.placa}"></span></p>
-                                <p><strong>Carga Máxima:</strong> <span th:text="${#numbers.formatDecimal(caminhao.cargaMaxima, 1, 2)} + ' kg'"></span></p>
+                            <div class="col-md-6">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-secondary-gray">Dimensões (C×L×A):</span>
+                                    <strong th:text="${#numbers.formatDecimal(solicitacao.comprimento, 1, 2)} + ' × ' + 
+                                                  ${#numbers.formatDecimal(solicitacao.largura, 1, 2)} + ' × ' + 
+                                                  ${#numbers.formatDecimal(solicitacao.altura, 1, 2)} + ' m'"></strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-secondary-gray">Volume:</span>
+                                    <strong th:text="${#numbers.formatDecimal(solicitacao.volume, 1, 4)} + ' m³'"></strong>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Origem e Destino -->
+                <div class="card-modern mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-map-pin"></i> Origem e Destino
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-success mb-2">
+                                    <i class="fas fa-map-marker-alt"></i> Origem
+                                </h6>
+                                <p class="mb-1" th:text="${solicitacao.origemEndereco}"></p>
+                                <small class="text-secondary-gray">
+                                    Coordenadas: <span th:text="${solicitacao.origemLat} + ', ' + ${solicitacao.origemLon}"></span>
+                                </small>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-danger mb-2">
+                                    <i class="fas fa-flag-checkered"></i> Destino
+                                </h6>
+                                <p class="mb-1" th:text="${solicitacao.destinoEndereco}"></p>
+                                <small class="text-secondary-gray">
+                                    Coordenadas: <span th:text="${solicitacao.destinoLat} + ', ' + ${solicitacao.destinoLon}"></span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cálculo do Frete -->
+                <div class="card-modern mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-calculator"></i> Detalhamento do Frete
+                    </div>
+                    <div class="card-body" th:if="${detalhe != null}">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-secondary-gray">
+                                        <i class="fas fa-road text-info"></i> Distância:
+                                    </span>
+                                    <strong th:text="${#numbers.formatDecimal(detalhe.distanciaKm, 1, 2)} + ' km'"></strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-secondary-gray">Custo por Peso:</span>
+                                    <strong th:text="'R$ ' + ${#numbers.formatDecimal(detalhe.custoPorPeso, 1, 2)}"></strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-secondary-gray">Custo por Caixa:</span>
+                                    <strong th:text="${detalhe.custoPorCaixa != null ? 'R$ ' + #numbers.formatDecimal(detalhe.custoPorCaixa, 1, 2) : 'N/A'}"></strong>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-secondary-gray">Custo Base:</span>
+                                    <strong th:text="'R$ ' + ${#numbers.formatDecimal(detalhe.custoBase, 1, 2)}"></strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-secondary-gray">Custo Km Rodado:</span>
+                                    <strong th:text="'R$ ' + ${#numbers.formatDecimal(detalhe.custoKmRodado, 1, 2)}"></strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-secondary-gray">Pedágio:</span>
+                                    <strong th:text="'R$ ' + ${#numbers.formatDecimal(detalhe.valorPedagio, 1, 2)}"></strong>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        <div class="text-center p-3" style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%); border-radius: 0.75rem;">
+                            <h5 class="text-white mb-1">Valor Total do Frete</h5>
+                            <h3 class="text-white mb-0">
+                                <strong th:text="${solicitacao.valorFrete != null ? 'R$ ' + #numbers.formatDecimal(solicitacao.valorFrete, 1, 2) : 'Não calculado'}"></strong>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card-footer">
-                <a th:href="@{/solicitacoes/atualizar/{id}(id=${solicitacao.id})}" class="btn btn-warning">Editar</a>
-                <a th:href="@{/solicitacoes/mostrar}" class="btn btn-secondary">Voltar</a>
-                <form th:action="@{/solicitacoes/deletar/{id}(id=${solicitacao.id})}" method="post" style="display: inline;">
-                    <button type="submit" class="btn btn-danger" 
-                            onclick="return confirm('Tem certeza que deseja excluir esta solicitação?')">Excluir</button>
-                </form>
+
+            <!-- Coluna Lateral -->
+            <div class="col-lg-4">
+                <!-- Caixa Utilizada -->
+                <div class="card-modern mb-4" th:if="${caixa != null}">
+                    <div class="card-header">
+                        <i class="fas fa-box"></i> Caixa Utilizada
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-secondary-gray">Material:</span>
+                            <strong th:text="${caixa.material}"></strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-secondary-gray">Dimensões:</span>
+                            <strong th:text="${#numbers.formatDecimal(caixa.comprimento, 1, 2)} + ' × ' + 
+                                          ${#numbers.formatDecimal(caixa.largura, 1, 2)} + ' × ' + 
+                                          ${#numbers.formatDecimal(caixa.altura, 1, 2)} + ' m'"></strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-secondary-gray">Limite de Peso:</span>
+                            <strong th:text="${#numbers.formatDecimal(caixa.limitePeso, 1, 2)} + ' kg'"></strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Caminhão Utilizado -->
+                <div class="card-modern mb-4" th:if="${caminhao != null}">
+                    <div class="card-header">
+                        <i class="fas fa-truck"></i> Caminhão Utilizado
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-secondary-gray">Modelo:</span>
+                            <strong th:text="${caminhao.modelo}"></strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-secondary-gray">Placa:</span>
+                            <strong th:text="${caminhao.placa}"></strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-secondary-gray">Carga Máxima:</span>
+                            <strong th:text="${#numbers.formatDecimal(caminhao.cargaMaxima, 1, 2)} + ' kg'"></strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ações -->
+                <div class="card-modern">
+                    <div class="card-header">
+                        <i class="fas fa-cog"></i> Ações
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/rastreamento/{id}(id=${solicitacao.id})}" 
+                               class="btn btn-corporate btn-corporate-primary">
+                                <i class="fas fa-map-marked-alt"></i> Rastrear
+                            </a>
+                            <a th:href="@{/solicitacoes/atualizar/{id}(id=${solicitacao.id})}" 
+                               class="btn btn-corporate btn-corporate-secondary">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <a th:href="@{/solicitacoes/mostrar}" 
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Voltar
+                            </a>
+                            <form th:action="@{/solicitacoes/deletar/{id}(id=${solicitacao.id})}" method="post">
+                                <button type="submit" class="btn btn-corporate btn-corporate-danger w-100"
+                                        data-confirm="Tem certeza que deseja excluir esta solicitação?">
+                                    <i class="fas fa-trash"></i> Excluir
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
     <div th:replace="~{fragmentos/footer :: footer}"></div>
 </body>
 </html>
-
