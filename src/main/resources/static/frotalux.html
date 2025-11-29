@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!-- fragmentos/head.html -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FrotaLux | Sistema de Gerenciamento Logístico</title>
+
+    <!-- Google Fonts (Inter e Poppins) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Poppins:wght@100;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS (framework principal) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome (Ícones) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- Leaflet.js (Mapas para Rastreamento) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Chart.js (Gráficos para Dashboard e Otimização) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+    <style>
+        /* fragmentos/head.html - CSS customizado (frotalux-theme.css) */
+        :root {
+            --color-primary: #1e3a8a; /* Azul corporativo, blue-800 */
+            --color-secondary: #3b82f6; /* Azul claro, blue-500 */
+            --color-success: #10b981; /* Verde esmeralda */
+            --color-warning: #f59e0b; /* Amarelo âmbar */
+            --color-danger: #ef4444; /* Vermelho */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Gray-100 */
+        }
+
+        .navbar-frotalux {
+            background-color: var(--color-primary);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-frotalux {
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card-frotalux:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 20px -4px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Estilos para a timeline de rastreamento */
+        .timeline {
+            position: relative;
+            padding: 20px 0 0 20px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: #d1d5db; /* gray-300 */
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .timeline-icon {
+            position: absolute;
+            left: -15px;
+            top: 0;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid var(--color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-primary);
+            font-size: 14px;
+            z-index: 10;
+        }
+        .timeline-icon.completed {
+            background-color: var(--color-primary);
+            color: #fff;
+            border-color: var(--color-primary);
+        }
+        .progress-bar-container {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e5e7eb;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease-in-out;
+        }
+
+        /* Estilo para animação de alerta crítico */
+        .pulse-critical {
+            animation: pulse-red 2s infinite;
+        }
+        @keyframes pulse-red {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+<!-- fragmentos/header.html (Navbar) -->
+<nav class="navbar-frotalux p-4 text-white sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <!-- Logo FrotaLux e Título -->
+        <a href="#dashboard" onclick="loadPage('dashboard')" class="text-2xl font-bold tracking-wider flex items-center">
+            <i class="fas fa-shipping-fast mr-2 text-blue-300"></i>
+            FrotaLux
+        </a>
+
+        <!-- Menu de Navegação (Desktop) -->
+        <div class="hidden md:flex space-x-6 font-medium">
+            <div class="relative group">
+                <a href="#dashboard" onclick="loadPage('dashboard')" class="hover:text-blue-200">Dashboard</a>
+            </div>
+
+            <div class="relative group">
+                <button class="flex items-center hover:text-blue-200">
+                    Entregas <i class="fas fa-caret-down ml-1 text-sm"></i>
+                </button>
+                <div class="absolute hidden group-hover:block bg-white text-gray-800 rounded-lg shadow-xl py-2 mt-1 w-56 z-50">
+                    <a href="#solicitacoes/mostrar" onclick="loadPage('solicitacoes/mostrar')" class="block px-4 py-2 hover:bg-gray-100">Solicitações</a>
+                    <a href="#solicitacao/cadastrar" onclick="loadPage('solicitacao/cadastrar')" class="block px-4 py-2 hover:bg-gray-100">Nova Solicitação</a>
+                    <a href="#rastreamento/mapa" onclick="loadPage('rastreamento/mapa')" class="block px-4 py-2 hover:bg-gray-100">Rastreamento</a>
+                </div>
+            </div>
+
+            <div class="relative group">
+                <button class="flex items-center hover:text-blue-200">
+                    Frota <i class="fas fa-caret-down ml-1 text-sm"></i>
+                </button>
+                <div class="absolute hidden group-hover:block bg-white text-gray-800 rounded-lg shadow-xl py-2 mt-1 w-56 z-50">
+                    <a href="#caminhao/listagem" onclick="loadPage('caminhao/listagem')" class="block px-4 py-2 hover:bg-gray-100">Caminhões</a>
+                    <a href="#motoristas/mostrar" onclick="loadPage('motoristas/mostrar')" class="block px-4 py-2 hover:bg-gray-100">Motoristas</a>
+                    <a href="#marca/listagem" onclick="loadPage('marca/listagem')" class="block px-4 py-2 hover:bg-gray-100">Marcas</a>
+                </div>
+            </div>
+
+            <div class="relative group">
+                <button class="flex items-center hover:text-blue-200">
+                    Operações <i class="fas fa-caret-down ml-1 text-sm"></i>
+                </button>
+                <div class="absolute hidden group-hover:block bg-white text-gray-800 rounded-lg shadow-xl py-2 mt-1 w-56 z-50">
+                    <a href="#manutencao/alertas" onclick="loadPage('manutencao/alertas')" class="block px-4 py-2 hover:bg-gray-100">Manutenção</a>
+                    <a href="#otimizacao/dashboard" onclick="loadPage('otimizacao/dashboard')" class="block px-4 py-2 hover:bg-gray-100">Otimização de Carga</a>
+                    <a href="#caixas/mostrar" onclick="loadPage('caixas/mostrar')" class="block px-4 py-2 hover:bg-gray-100">Caixas Padronizadas</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ícones de Ação (Busca e Notificações) -->
+        <div class="flex items-center space-x-4">
+            <!-- Busca Rápida -->
+            <button class="p-2 hover:bg-blue-700/50 rounded-full transition duration-150">
+                <i class="fas fa-search"></i>
+            </button>
+            <!-- Notificações -->
+            <button class="p-2 hover:bg-blue-700/50 rounded-full transition duration-150 relative">
+                <i class="fas fa-bell"></i>
+                <!-- Badge com contador -->
+                <span id="notification-badge" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">4</span>
+            </button>
+            <!-- Menu Mobile (oculto no desktop) -->
+            <button class="md:hidden p-2 hover:bg-blue-700/50 rounded-full transition duration-150" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- Container principal de conteúdo -->
+<main id="app-content" class="max-w-7xl mx-auto p-4 md:p-8"></main>
+
+<!-- fragmentos/footer.html -->
+<footer class="bg-gray-200 text-gray-700 p-4 mt-12">
+    <div class="max-w-7xl mx-auto text-center text-sm">
+        &copy; <span id="currentYear"></span> FrotaLux - Sistema de Gerenciamento Logístico. Todos os direitos reservados.
+        <div class="mt-1">
+            <span class="text-xs">Desenvolvido com <i class="fas fa-heart text-red-500 mx-1"></i> e Tailwind CSS.</span>
+        </div>
+    </div>
+</footer>
+
+<!-- JavaScript para Simulação de Rotas e Funcionalidades -->
+<script>
+    // Define o ano atual no footer
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+    // --- CONSTANTES E FUNÇÕES DE CÁLCULO LOGÍSTICO (NOVA LÓGICA) ---
+    const FATOR_CUBAGEM_RODOVIARIO = 300; // kg/m³
+
+    // Função utilitária para formatar valores
+    const formatBRL = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+    const formatVolume = (value) => `${value.toFixed(3)} m³`;
+    const formatWeight = (value) => `${value.toFixed(2)} kg`;
+
+    // 1. Calcula o Volume Cúbico (m³)
+    const calcularVolume = (c, l, a) => c * l * a;
+
+    // 2. Calcula o Peso Cubado
+    const calcularPesoCubado = (volume, fatorCubagem = FATOR_CUBAGEM_RODOVIARIO) => volume * fatorCubagem;
+
+    // 3. Compara e determina o Peso Cobrável (maior entre Real e Cubado)
+    const calcularPesoCobranca = (pesoReal, pesoCubado) => Math.max(pesoReal, pesoCubado);
+
+    // 4. Calcula Frete (Simulado)
+    // Valor por Km é o custo base por Km rodado pelo caminhão (e.g., combustível, manutenção)
+    // Pedágio Simulado (seria obtido via API como Google Routes ou OpenRouteService)
+    const calcularFrete = (pesoCobranca, distanciaKm, valorKm, pedagio) => {
+        const custoPorPeso = pesoCobranca * 0.1; // Simulação: Custo de R$0.10 por kg/cobrável
+        const custoPorDistancia = distanciaKm * valorKm;
+        const freteBase = custoPorPeso + custoPorDistancia;
+        const freteTotal = freteBase + pedagio;
+        return { freteBase, pedagio, freteTotal };
+    };
+
+    // 5. Verifica se o produto cabe na caixa (C, L, A do produto devem ser menores ou iguais à C, L, A da caixa, em qualquer orientação)
+    const isProductFitting = (prodC, prodL, prodA, boxC, boxL, boxA) => {
+        const prodDims = [prodC, prodL, prodA].sort((a, b) => b - a);
+        const boxDims = [boxC, boxL, boxA].sort((a, b) => b - a);
+
+        // Se a maior dimensão do produto for menor/igual à maior dimensão da caixa, e assim por diante.
+        return prodDims[0] <= boxDims[0] && prodDims[1] <= boxDims[1] && prodDims[2] <= boxDims[2];
+    };
+
+    // Retorna a cor do status em Tailwind
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'Coleta': return 'bg-gray-400';
+            case 'Em Processamento': return 'bg-yellow-500';
+            case 'A Caminho': return 'bg-blue-600';
+            case 'Entregue': return 'bg-green-600';
+            default: return 'bg-gray-500';
+        }
+    };
+
+    // --- LÓGICA DE DADOS (CONEXÃO COM BACKEND) ---
+
+    const API_BASE_URL = ''; // Deixe em branco se estiver na mesma origem
+
+    const fetchData = async (endpoint) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}${endpoint}`);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ message: response.statusText }));
+                throw new Error(`Erro na rede: ${errorData.message || response.statusText}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error(`Falha ao buscar dados de ${endpoint}:`, error);
+            document.getElementById('app-content').innerHTML = `
+                <div class="text-center py-20 bg-red-100 text-red-700 p-4 rounded-lg">
+                    <h2 class="text-2xl font-bold">Falha na Conexão com o Servidor</h2>
+                    <p>Não foi possível carregar os dados. Verifique sua conexão ou tente novamente mais tarde.</p>
+                    <p class="text-sm mt-2">Endpoint: ${endpoint} | Erro: ${error.message}</p>
+                </div>
+            `;
+            throw error; // Lança o erro para interromper a execução da renderização
+        }
+    };
+
+    const postData = async (endpoint, data, method = 'POST') => {
+        try {
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ message: response.statusText }));
+                throw new Error(`Erro ao enviar dados: ${errorData.message || response.statusText}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error(`Falha ao enviar dados para ${endpoint}:`, error);
+            alert(`Erro ao salvar: ${error.message}`); // Exibe um alerta de erro
+            throw error;
+        }
+    };
+    
+    // --- FUNÇÕES DE RENDERIZAÇÃO DE PÁGINAS (AGORA ASSÍNCRONAS) ---
+
+    // 🏠 Dashboard Principal (dashboard.html)
+    const renderDashboard = async () => {
+        const solicitacoes = await fetchData('/api/solicitacoes');
+        const caminhoes = await fetchData('/api/caminhoes');
+        // A API poderia fornecer estatísticas prontas, ex: /api/stats
+        const stats = {
+            totalEntregas: 1540, // Exemplo, idealmente viria da API
+            emAndamento: solicitacoes.filter(s => s.status === 'A Caminho' || s.status === 'Em Processamento').length,
+            concluidasHoje: 12, // Exemplo, idealmente viria da API
+        };
+
+        const kmToNextService = (caminhao, serviceKm) => serviceKm - (caminhao.kmRodado % serviceKm);
+
+        const alertas = caminhoes.flatMap(c => {
+            const alertaPneu = { km: 70000, type: 'Pneus', msg: `Pneus: ${c.modelo} (${c.placa})`, progress: (c.kmRodado / 70000) * 100, isCritical: kmToNextService(c, 70000) < 5000 };
+            const alertaPreventiva = { km: 10000, type: 'Preventiva', msg: `Óleo/Filtros: ${c.modelo} (${c.placa})`, progress: (c.kmRodado % 10000 / 10000) * 100, isCritical: kmToNextService(c, 10000) < 1000 };
+            return [alertaPneu, alertaPreventiva].filter(a => a.progress > 80 || a.isCritical);
+        });
+
+        const html = `
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">🏠 Dashboard Principal</h1>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="card-frotalux bg-white p-6 flex items-center justify-between border-b-4 border-blue-500">
+                    <div><p class="text-sm text-gray-500">Total de Entregas</p><p class="text-3xl font-bold text-gray-900">${stats.totalEntregas}</p></div>
+                    <i class="fas fa-boxes text-4xl text-blue-500 opacity-60"></i>
+                </div>
+                <div class="card-frotalux bg-white p-6 flex items-center justify-between border-b-4 border-yellow-500">
+                    <div><p class="text-sm text-gray-500">Em Andamento</p><p class="text-3xl font-bold text-yellow-600">${stats.emAndamento}</p></div>
+                    <i class="fas fa-truck-moving text-4xl text-yellow-500 opacity-60"></i>
+                </div>
+                <div class="card-frotalux bg-white p-6 flex items-center justify-between border-b-4 border-green-500">
+                    <div><p class="text-sm text-gray-500">Concluídas Hoje</p><p class="text-3xl font-bold text-green-600">${stats.concluidasHoje}</p></div>
+                    <i class="fas fa-check-circle text-4xl text-green-500 opacity-60"></i>
+                </div>
+                <div class="card-frotalux bg-white p-6 flex items-center justify-between cursor-pointer border-b-4 ${alertas.length > 0 ? 'border-red-600 pulse-critical' : 'border-gray-400'}" onclick="loadPage('manutencao/alertas')">
+                    <div><p class="text-sm text-gray-500">Alertas Manutenção</p><p class="text-3xl font-bold ${alertas.length > 0 ? 'text-red-600' : 'text-gray-500'}">${alertas.length}</p></div>
+                    <i class="fas fa-tools text-4xl ${alertas.length > 0 ? 'text-red-500' : 'text-gray-400'} opacity-60"></i>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 card-frotalux bg-white p-6">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-800">Gráfico: Status da Frota e Entregas</h2>
+                    <canvas id="statusChart" class="h-80"></canvas>
+                </div>
+                <div class="card-frotalux bg-white p-6">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-800">Entregas Recentes</h2>
+                    <ul class="space-y-3">
+                        ${solicitacoes.slice(0, 3).map(s => `
+                            <li class="p-3 bg-gray-50 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-100" onclick="loadPage('solicitacoes/mostrar-detalhe', '${s.id}')">
+                                <div>
+                                    <p class="font-medium">${s.produto}</p>
+                                    <p class="text-xs text-gray-500">${s.origem} para ${s.destino}</p>
+                                </div>
+                                <span class="text-xs font-bold ${getStatusColor(s.status)} text-white px-2 py-1 rounded-full">${s.status}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                     <button onclick="loadPage('solicitacoes/mostrar')" class="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">Ver Todas as Solicitações</button>
+                </div>
+            </div>
+        `;
+        document.getElementById('app-content').innerHTML = html;
+        initStatusChart(solicitacoes);
+    };
+
+    const initStatusChart = (solicitacoes) => {
+        const ctx = document.getElementById('statusChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Em Andamento', 'Concluídas', 'Aguardando Coleta'],
+                    datasets: [{
+                        data: [
+                            solicitacoes.filter(s => s.status === 'A Caminho' || s.status === 'Em Processamento').length,
+                            solicitacoes.filter(s => s.status === 'Entregue').length,
+                            solicitacoes.filter(s => s.status === 'Coleta').length
+                        ],
+                        backgroundColor: ['#f59e0b', '#10b981', '#6b7280'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+    };
+
+    // 📦 Módulo de Caixas Padronizadas - Listagem (caixas/mostrar.html)
+    const renderCaixasListagem = async () => {
+        const caixas = await fetchData('/api/caixas');
+        const html = `
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">📦 Caixas Padronizadas</h1>
+            <div class="flex justify-between items-center mb-6">
+                <input type="text" placeholder="Buscar caixa por descrição ou material..." class="p-2 border border-gray-300 rounded-lg w-full md:w-1/3">
+                <button onclick="loadPage('caixa/formulario')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition ml-4"><i class="fas fa-plus mr-2"></i>Nova Caixa</button>
+            </div>
+            <div class="card-frotalux bg-white p-6">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dimensões (CxLxA)</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Volume (m³)</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Limite Peso (kg)</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        ${caixas.map(caixa => `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">${caixa.descricao}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">${caixa.c}m x ${caixa.l}m x ${caixa.a}m</td>
+                                <td class="px-6 py-4 whitespace-nowrap font-medium text-blue-600">${formatVolume(calcularVolume(caixa.c, caixa.l, caixa.a))}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">${formatWeight(caixa.limitePeso)}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button onclick="loadPage('caixa/formulario', ${caixa.id})" class="text-indigo-600 hover:text-indigo-900"><i class="fas fa-edit"></i> Editar</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+        document.getElementById('app-content').innerHTML = html;
+    };
+
+    // 📦 Módulo de Caixas - Formulário (caixa/formulario.html)
+    const renderCaixaFormulario = async (id) => {
+        const isEditing = id != null;
+        const caixa = isEditing ? await fetchData(`/api/caixas/${id}`) : null;
+
+        const title = isEditing ? `📦 Editando Caixa: ${caixa.descricao}` : '📦 Nova Caixa';
+
+        const html = `
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">${title}</h1>
+            <div class="card-frotalux bg-white p-8">
+                <form id="caixa-form" onsubmit="handleCaixaSubmit(event, ${id})">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                            <label for="descricao" class="block mb-2 text-sm font-medium text-gray-700">Descrição</label>
+                            <input type="text" id="descricao" name="descricao" value="${caixa?.descricao || ''}" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                        </div>
+                        <div>
+                            <label for="material" class="block mb-2 text-sm font-medium text-gray-700">Material</label>
+                            <input type="text" id="material" name="material" value="${caixa?.material || ''}" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                        </div>
+                        <div>
+                            <label for="valor" class="block mb-2 text-sm font-medium text-gray-700">Valor (R$)</label>
+                            <input type="number" step="0.01" id="valor" name="valor" value="${caixa?.valor || ''}" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                        </div>
+                        <div>
+                            <label for="limitePeso" class="block mb-2 text-sm font-medium text-gray-700">Limite de Peso (kg)</label>
+                            <input type="number" step="0.01" id="limitePeso" name="limitePeso" value="${caixa?.limitePeso || ''}" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                        </div>
+                        <div class="md:col-span-2">
+                            <h3 class="font-semibold mt-4 mb-2">Dimensões da Caixa (metros)</h3>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div>
+                                    <label for="c" class="block mb-1 text-xs text-gray-600">Comprimento</label>
+                                    <input type="number" step="0.01" id="c" name="c" value="${caixa?.c || ''}" placeholder="Comp." class="w-full p-3 border border-gray-300 rounded-lg" required>
+                                </div>
+                                <div>
+                                    <label for="l" class="block mb-1 text-xs text-gray-600">Largura</label>
+                                    <input type="number" step="0.01" id="l" name="l" value="${caixa?.l || ''}" placeholder="Larg." class="w-full p-3 border border-gray-300 rounded-lg" required>
+                                </div>
+                                <div>
+                                    <label for="a" class="block mb-1 text-xs text-gray-600">Altura</label>
+                                    <input type="number" step="0.01" id="a" name="a" value="${caixa?.a || ''}" placeholder="Alt." class="w-full p-3 border border-gray-300 rounded-lg" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-t pt-6 mt-6 flex justify-end space-x-3">
+                        <button type="button" onclick="loadPage('caixas/mostrar')" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition font-semibold">Cancelar</button>
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold"><i class="fas fa-save mr-2"></i>Salvar</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        document.getElementById('app-content').innerHTML = html;
+    };
+
+    const handleCaixaSubmit = async (event, id) => {
+        event.preventDefault();
+        const isEditing = id != null;
+        const form = event.target;
+        const formData = new FormData(form);
+        
+        const data = {
+            descricao: formData.get('descricao'),
+            material: formData.get('material'),
+            valor: parseFloat(formData.get('valor')),
+            limitePeso: parseFloat(formData.get('limitePeso')),
+            c: parseFloat(formData.get('c')),
+            l: parseFloat(formData.get('l')),
+            a: parseFloat(formData.get('a')),
+        };
+
+        const endpoint = isEditing ? `/api/caixas/${id}` : '/api/caixas';
+        const method = isEditing ? 'PUT' : 'POST';
+
+        try {
+            await postData(endpoint, data, method);
+            alert(`Caixa ${isEditing ? 'atualizada' : 'cadastrada'} com sucesso!`);
+            loadPage('caixas/mostrar');
+        } catch (error) {
+            // O erro já é tratado em postData
+        }
+    };
+
+    // 🚚 Módulo de Caminhões - Listagem (caminhao/listagem.html)
+    const renderCaminhaoListagem = async () => {
+        const caminhoes = await fetchData('/api/caminhoes');
+        const getManutencaoProgress = (c, serviceKm) => (c.kmRodado % serviceKm / serviceKm) * 100;
+        const getProgressColor = (progress) => {
+            if (progress > 90) return 'bg-red-500';
+            if (progress > 80) return 'bg-yellow-500';
+            return 'bg-green-500';
+        };
+
+        const html = `
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">🚚 Listagem de Caminhões da Frota</h1>
+            <div class="flex justify-end mb-6">
+                <button onclick="loadPage('caminhao/formulario')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"><i class="fas fa-plus mr-2"></i>Novo Caminhão</button>
+            </div>
+            <div class="card-frotalux bg-white p-6">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modelo / Placa</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capacidade (kg)</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metragem Cúbica</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Próxima Manutenção</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        ${caminhoes.map(caminhao => {
+                            const volume = calcularVolume(caminhao.c, caminhao.l, caminhao.a);
+                            const progressPreventiva = getManutencaoProgress(caminhao, 10000);
+                            const progressPneus = getManutencaoProgress(caminhao, 70000);
+                            return `
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <p class="font-semibold">${caminhao.modelo}</p>
+                                        <p class="text-sm text-gray-500">${caminhao.placa}</p>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">${caminhao.capacidade.toLocaleString('pt-BR')} kg</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">${formatVolume(volume)}</td>
+                                    <td class="px-6 py-4">
+                                        <p class="text-xs text-gray-500 mb-1">Preventiva (10k): ${Math.round(caminhao.kmRodado % 10000)} / 10.000 Km</p>
+                                        <div class="progress-bar-container w-40 mb-1">
+                                            <div class="progress-bar ${getProgressColor(progressPreventiva)}" style="width: ${progressPreventiva}%;"></div>
+                                        </div>
+                                        <p class="text-xs text-gray-500 mb-1">Pneus (70k): ${Math.round(caminhao.kmRodado % 70000)} / 70.000 Km</p>
+                                        <div class="progress-bar-container w-40">
+                                            <div class="progress-bar ${getProgressColor(progressPneus)}" style="width: ${progressPneus}%;"></div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button onclick="loadPage('caminhao/formulario', ${caminhao.id})" class="text-indigo-600 hover:text-indigo-900"><i class="fas fa-edit"></i> Editar</button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+        document.getElementById('app-content').innerHTML = html;
+    }
+
+    // 🚚 Módulo de Caminhões - Formulário (caminhao/formulario.html)
+    const renderCaminhaoFormulario = async (id) => {
+        const isEditing = id != null;
+        const [marcas, caminhao] = await Promise.all([
+            fetchData('/api/marcas'),
+            isEditing ? fetchData(`/api/caminhoes/${id}`) : Promise.resolve(null)
+        ]);
+
+        const title = isEditing ? `🚚 Editando Caminhão: ${caminhao.modelo}` : '🚚 Novo Caminhão';
+
+        const html = `
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">${title}</h1>
+            <div class="card-frotalux bg-white p-8">
+                <form id="caminhao-form" onsubmit="handleCaminhaoSubmit(event, ${id})">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Coluna 1 -->
+                        <div>
+                            <label for="placa" class="block mb-2 text-sm font-medium text-gray-700">Placa</label>
+                            <input type="text" id="placa" name="placa" value="${caminhao?.placa || ''}" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                        </div>
+                        <div>
+                            <label for="modelo" class="block mb-2 text-sm font-medium text-gray-700">Modelo</label>
+                            <input type="text" id="modelo" name="modelo" value="${caminhao?.modelo || ''}" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                        </div>
+                        <div>
+                            <label for="marca" class="block mb-2 text-sm font-medium text-gray-700">Marca</label>
+                            <select id="marca" name="marcaId" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                                <option value="">Selecione uma marca</option>
+                                ${marcas.map(marca => `<option value="${marca.id}" ${caminhao?.marca?.id === marca.id ? 'selected' : ''}>${marca.nome}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="capacidade" class="block mb-2 text-sm font-medium text-gray-700">Capacidade de Carga (kg)</label>
+                            <input type="number" id="capacidade" name="capacidade" value="${caminhao?.capacidade || ''}" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                        </div>
+                        
+                        <!-- Coluna 2 -->
+                        <div>
+                            <label for="kmRodado" class="block mb-2 text-sm font-medium text-gray-700">KM Rodado</label>
+                            <input type="number" id="kmRodado" name="kmRodado" value="${caminhao?.kmRodado || '0'}" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                        </div>
+                        <div>
+                            <label for="valorKm" class="block mb-2 text-sm font-medium text-gray-700">Custo por KM (R$)</label>
+                            <input type="number" step="0.01" id="valorKm" name="valorKm" value="${caminhao?.valorKm || ''}" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                        </div>
+                        <div class="col-span-2">
+                            <h3 class="font-semibold mt-4 mb-2">Dimensões do Baú (metros)</h3>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div>
+                                    <label for="c" class="block mb-1 text-xs text-gray-600">Comprimento</label>
+                                    <input type="number" step="0.01" id="c" name="c" value="${caminhao?.c || ''}" placeholder="Comp." class="w-full p-3 border border-gray-300 rounded-lg" required>
+                                </div>
+                                <div>
+                                    <label for="l" class="block mb-1 text-xs text-gray-600">Largura</label>
+                                    <input type="number" step="0.01" id="l" name="l" value="${caminhao?.l || ''}" placeholder="Larg." class="w-full p-3 border border-gray-300 rounded-lg" required>
+                                </div>
+                                <div>
+                                    <label for="a" class="block mb-1 text-xs text-gray-600">Altura</label>
+                                    <input type="number" step="0.01" id="a" name="a" value="${caminhao?.a || ''}" placeholder="Alt." class="w-full p-3 border border-gray-300 rounded-lg" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-t pt-6 mt-6 flex justify-end space-x-3">
+                        <button type="button" onclick="loadPage('caminhao/listagem')" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition font-semibold">Cancelar</button>
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold"><i class="fas fa-save mr-2"></i>Salvar</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        document.getElementById('app-content').innerHTML = html;
+    };
+
+    const handleCaminhaoSubmit = async (event, id) => {
+        event.preventDefault();
+        const isEditing = id != null;
+        const form = event.target;
+        const formData = new FormData(form);
+        
+        const data = {
+            placa: formData.get('placa'),
+            modelo: formData.get('modelo'),
+            capacidade: parseFloat(formData.get('capacidade')),
+            kmRodado: parseFloat(formData.get('kmRodado')),
+            valorKm: parseFloat(formData.get('valorKm')),
+            c: parseFloat(formData.get('c')),
+            l: parseFloat(formData.get('l')),
+            a: parseFloat(formData.get('a')),
+            marca: { id: parseInt(formData.get('marcaId')) } // Envia o objeto de marca aninhado
+        };
+
+        const endpoint = isEditing ? `/api/caminhoes/${id}` : '/api/caminhoes';
+        const method = isEditing ? 'PUT' : 'POST';
+
+        try {
+            await postData(endpoint, data, method);
+            alert(`Caminhão ${isEditing ? 'atualizado' : 'cadastrado'} com sucesso!`);
+            loadPage('caminhao/listagem');
+        } catch (error) {
+            // O erro já é tratado em postData, mas podemos adicionar lógica extra aqui se necessário
+        }
+    };
+
+    // 👨‍✈️ Módulo de Motoristas - Listagem (motoristas/mostrar.html)
+    const renderMotoristaListagem = async () => {
+        const motoristas = await fetchData('/api/motoristas');
+        const html = `
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">👨‍✈️ Listagem de Motoristas</h1>
+            <div class="flex justify-end mb-6">
+                <button onclick="loadPage('motorista/formulario')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"><i class="fas fa-plus mr-2"></i>Novo Motorista</button>
+            </div>
+            <div class="card-frotalux bg-white p-6">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CNH</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        ${motoristas.map(m => `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <p class="font-semibold">${m.nome}</p>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <p class="font-medium">Categoria ${m.categoria}</p>
+                                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${m.cnhValida ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                        CNH ${m.cnhValida ? 'Válida' : 'Vencida'}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${m.status === 'Disponível' ? 'bg-green-100 text-green-800' : m.status === 'Em Rota' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}">
+                                        ${m.status}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button onclick="loadPage('motorista/formulario', ${m.id})" class="text-indigo-600 hover:text-indigo-900"><i class="fas fa-edit"></i> Editar</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+        document.getElementById('app-content').innerHTML = html;
+    };
+
+    // 👨‍✈️ Módulo de Motoristas - Formulário (motorista/formulario.html)
+    const renderMotoristaFormulario = async (id) => {
+        const isEditing = id != null;
+        const motorista = isEditing ? await fetchData(`/api/motoristas/${id}`) : null;
+
+        const title = isEditing ? `👨‍✈️ Editando Motorista: ${motorista.nome}` : '👨‍✈️ Novo Motorista';
+
+        const html = `
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">${title}</h1>
+            <div class="card-frotalux bg-white p-8">
+                <form id="motorista-form" onsubmit="handleMotoristaSubmit(event, ${id})">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                            <label for="nome" class="block mb-2 text-sm font-medium text-gray-700">Nome Completo</label>
+                            <input type="text" id="nome" name="nome" value="${motorista?.nome || ''}" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                        </div>
+                        <div>
+                            <label for="status" class="block mb-2 text-sm font-medium text-gray-700">Status</label>
+                            <select id="status" name="status" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                                <option value="Disponível" ${motorista?.status === 'Disponível' ? 'selected' : ''}>Disponível</option>
+                                <option value="Em Rota" ${motorista?.status === 'Em Rota' ? 'selected' : ''}>Em Rota</option>
+                                <option value="Férias" ${motorista?.status === 'Férias' ? 'selected' : ''}>Férias</option>
+                                <option value="Afastado" ${motorista?.status === 'Afastado' ? 'selected' : ''}>Afastado</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="categoria" class="block mb-2 text-sm font-medium text-gray-700">Categoria CNH</label>
+                            <select id="categoria" name="categoria" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                                <option value="C" ${motorista?.categoria === 'C' ? 'selected' : ''}>C</option>
+                                <option value="D" ${motorista?.categoria === 'D' ? 'selected' : ''}>D</option>
+                                <option value="E" ${motorista?.categoria === 'E' ? 'selected' : ''}>E</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2 flex items-center">
+                            <input type="checkbox" id="cnhValida" name="cnhValida" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" ${motorista?.cnhValida ? 'checked' : ''}>
+                            <label for="cnhValida" class="ml-2 block text-sm text-gray-900">CNH está válida?</label>
+                        </div>
+                    </div>
+                    <div class="border-t pt-6 mt-6 flex justify-end space-x-3">
+                        <button type="button" onclick="loadPage('motoristas/mostrar')" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition font-semibold">Cancelar</button>
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold"><i class="fas fa-save mr-2"></i>Salvar</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        document.getElementById('app-content').innerHTML = html;
+    };
+
+    const handleMotoristaSubmit = async (event, id) => {
+        event.preventDefault();
+        const isEditing = id != null;
+        const form = event.target;
+        const formData = new FormData(form);
+        
+        const data = {
+            nome: formData.get('nome'),
+            status: formData.get('status'),
+            categoria: formData.get('categoria'),
+            cnhValida: form.querySelector('#cnhValida').checked,
+        };
+
+        const endpoint = isEditing ? `/api/motoristas/${id}` : '/api/motoristas';
+        const method = isEditing ? 'PUT' : 'POST';
+
+        try {
+            await postData(endpoint, data, method);
+            alert(`Motorista ${isEditing ? 'atualizado' : 'cadastrado'} com sucesso!`);
+            loadPage('motoristas/mostrar');
+        } catch (error) {
+            // O erro já é tratado em postData
+        }
+    };
+    
+    // --- FUNÇÕES GENÉRICAS PARA TELAS SIMPLES ---
+
+    const renderSimpleListagem = async (title, endpoint, newItemRoute, nameField = 'nome') => {
+        const items = await fetchData(endpoint);
+        const html = `
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">${title}</h1>
+            <div class="flex justify-end mb-6">
+                <button onclick="loadPage('${newItemRoute}')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"><i class="fas fa-plus mr-2"></i>Novo Item</button>
+            </div>
+            <div class="card-frotalux bg-white p-6">
+                <ul class="divide-y divide-gray-200">
+                    ${items.map(item => `
+                        <li class="p-4 flex justify-between items-center hover:bg-gray-50">
+                            <span class="font-medium text-gray-800">${item[nameField]}</span>
+                            <button onclick="loadPage('${newItemRoute}', ${item.id})" class="text-indigo-600 hover:text-indigo-900 text-sm"><i class="fas fa-edit"></i> Editar</button>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+        `;
+        document.getElementById('app-content').innerHTML = html;
+    }
+
+    const renderSimpleForm = (title) => {
+        document.getElementById('app-content').innerHTML = `
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">${title}</h1>
+            <div class="card-frotalux bg-white p-8">
+                <p class="text-lg text-gray-700 mb-4">Formulário de cadastro/edição. Conecte este formulário ao seu endpoint de API (POST/PUT).</p>
+                <form onsubmit="alert('Formulário Enviado! (Simulação)'); return false;">
+                    <div class="space-y-4">
+                        <label class="block mb-2 text-sm font-medium text-gray-700">Nome/Descrição</label>
+                        <input type="text" value="Exemplo de Conteúdo" class="w-full p-3 border border-gray-300 rounded-lg" required>
+
+                        <label class="block mb-2 text-sm font-medium text-gray-700">Campo Adicional</label>
+                        <input type="text" placeholder="Outro atributo" class="w-full p-3 border border-gray-300 rounded-lg">
+                    </div>
+                    <div class="border-t pt-6 mt-6 flex justify-end space-x-3">
+                        <button type="button" onclick="window.history.back()" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition font-semibold">Cancelar</button>
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold"><i class="fas fa-save mr-2"></i>Salvar</button>
+                    </div>
+                </form>
+            </div>
+        `;
+    }
+
+    // 🚨 Página não encontrada
+    const renderNotFound = () => {
+        document.getElementById('app-content').innerHTML = `
+            <div class="text-center py-20">
+                <h1 class="text-6xl font-extrabold text-red-500">404</h1>
+                <p class="text-2xl font-medium text-gray-700 mt-4">Página Não Encontrada</p>
+                <p class="text-gray-500 mt-2">Parece que você se perdeu na logística da FrotaLux.</p>
+                <button onclick="loadPage('dashboard')" class="mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"><i class="fas fa-home mr-2"></i>Voltar para o Dashboard</button>
+            </div>
+        `;
+    };
+
+    // --- LÓGICA DE ROTEAMENTO E CARREGAMENTO ---
+
+    const loadPage = (route, id = null) => {
+        window.location.hash = route + (id !== null ? '/' + id : '');
+    };
+
+    const routeHandler = async () => {
+        const path = window.location.hash.slice(1) || 'dashboard';
+        const parts = path.split('/');
+        const mainRoute = parts[0] + (parts.length > 1 && !/^\d+$/.test(parts[1]) ? '/' + parts[1] : '');
+        const id = parts.find(p => /^\d+$/.test(p)) || (parts.length > 1 && !/^\d+$/.test(parts[1]) ? parts[2] : parts[1]) || null;
+
+
+        document.getElementById('app-content').innerHTML = `<div class="text-center py-20"><i class="fas fa-spinner fa-spin text-4xl text-blue-500"></i><p class="mt-4 text-gray-600">Carregando ${mainRoute}...</p></div>`;
+
+        try {
+            switch (mainRoute) {
+                case 'dashboard':
+                    await renderDashboard();
+                    break;
+                case 'caixas/mostrar':
+                    await renderCaixasListagem();
+                    break;
+                case 'caixa/formulario':
+                    await renderCaixaFormulario(id);
+                    break;
+                case 'caminhao/listagem':
+                    await renderCaminhaoListagem();
+                    break;
+                case 'caminhao/formulario':
+                    await renderCaminhaoFormulario(id);
+                    break;
+                case 'motoristas/mostrar':
+                    await renderMotoristaListagem();
+                    break;
+                case 'motorista/formulario':
+                    await renderMotoristaFormulario(id);
+                    break;
+                case 'marca/listagem':
+                    await renderSimpleListagem('🏷️ Listagem de Marcas', '/api/marcas', 'marca/formulario');
+                    break;
+                case 'marca/formulario':
+                    renderSimpleForm('🏷️ Cadastro/Edição de Marca'); // Ainda usando o simples
+                    break;
+                default:
+                    renderNotFound();
+                    break;
+            }
+        } catch (error) {
+            // O erro já é tratado em fetchData, então a renderização para
+            console.error("Erro final no roteador:", error);
+        }
+    };
+
+    window.addEventListener('hashchange', routeHandler);
+    window.onload = routeHandler;
+
+</script>
+</body>
+</html>

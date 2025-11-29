@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Solicitação de Transporte</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-4 sm:p-8 bg-gray-50 min-h-screen">
+<div class="max-w-5xl mx-auto bg-white shadow-xl rounded-xl p-6 md:p-10 border border-pink-100">
+    <h1 class="text-2xl sm:text-3xl font-bold text-pink-700 mb-6 border-b pb-2">
+        Formulário: Solicitação de Transporte
+    </h1>
+    <form class="space-y-6">
+        <h2 class="text-xl font-semibold text-gray-800">Informações da Carga</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Produto -->
+            <div>
+                <label for="solicitacao-produto" class="block text-sm font-medium text-gray-700">Descrição do Produto</label>
+                <input type="text" id="solicitacao-produto" placeholder="Ex: Paletes de Cimento" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required>
+            </div>
+            <!-- Peso Real -->
+            <div>
+                <label for="solicitacao-peso-real" class="block text-sm font-medium text-gray-700">Peso Real (kg)</label>
+                <input type="number" step="0.01" id="solicitacao-peso-real" placeholder="Ex: 1500.0" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <!-- Comprimento -->
+            <div>
+                <label for="solicitacao-comprimento" class="block text-sm font-medium text-gray-700">Comprimento (m)</label>
+                <input type="number" step="0.01" id="solicitacao-comprimento" placeholder="Ex: 1.20" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required>
+            </div>
+            <!-- Largura -->
+            <div>
+                <label for="solicitacao-largura" class="block text-sm font-medium text-gray-700">Largura (m)</label>
+                <input type="number" step="0.01" id="solicitacao-largura" placeholder="Ex: 1.00" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required>
+            </div>
+            <!-- Altura -->
+            <div>
+                <label for="solicitacao-altura" class="block text-sm font-medium text-gray-700">Altura (m)</label>
+                <input type="number" step="0.01" id="solicitacao-altura" placeholder="Ex: 1.50" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required>
+            </div>
+        </div>
+
+        <h2 class="text-xl font-semibold text-gray-800 pt-4 border-t mt-6">Endereços</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Origem Endereço -->
+            <div>
+                <label for="solicitacao-origem" class="block text-sm font-medium text-gray-700">Endereço de Origem</label>
+                <textarea id="solicitacao-origem" rows="2" placeholder="Rua A, 123, Bairro X, Cidade Y" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required></textarea>
+            </div>
+            <!-- Destino Endereço -->
+            <div>
+                <label for="solicitacao-destino" class="block text-sm font-medium text-gray-700">Endereço de Destino</label>
+                <textarea id="solicitacao-destino" rows="2" placeholder="Av. Z, 456, Bairro W, Cidade V" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required></textarea>
+            </div>
+        </div>
+
+        <h2 class="text-xl font-semibold text-gray-800 pt-4 border-t mt-6">Informações de Contato</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <!-- Nome Cliente -->
+            <div>
+                <label for="nome-cliente" class="block text-sm font-medium text-gray-700">Nome do Cliente Solicitante</label>
+                <input type="text" id="nome-cliente" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required>
+            </div>
+            <!-- Telefone Cliente -->
+            <div>
+                <label for="telefone-cliente" class="block text-sm font-medium text-gray-700">Telefone do Cliente</label>
+                <input type="tel" id="telefone-cliente" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required>
+            </div>
+            <!-- Email Cliente -->
+            <div>
+                <label for="email-cliente" class="block text-sm font-medium text-gray-700">E-mail do Cliente</label>
+                <input type="email" id="email-cliente" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <!-- Nome Recebedor -->
+            <div>
+                <label for="nome-recebedor" class="block text-sm font-medium text-gray-700">Nome do Recebedor</label>
+                <input type="text" id="nome-recebedor" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required>
+            </div>
+            <!-- Telefone Recebedor -->
+            <div>
+                <label for="telefone-recebedor" class="block text-sm font-medium text-gray-700">Telefone do Recebedor</label>
+                <input type="tel" id="telefone-recebedor" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required>
+            </div>
+        </div>
+
+        <h2 class="text-xl font-semibold text-gray-800 pt-4 border-t mt-6">Logística e Valores</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-6">
+            <!-- Distância KM -->
+            <div>
+                <label for="distancia-km" class="block text-sm font-medium text-gray-700">Distância (km)</label>
+                <input type="number" step="0.01" id="distancia-km" placeholder="Ex: 850.5" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required>
+            </div>
+            <!-- Valor Pedágio -->
+            <div>
+                <label for="valor-pedagio" class="block text-sm font-medium text-gray-700">Valor Pedágio (R$)</label>
+                <input type="number" step="0.01" id="valor-pedagio" placeholder="Ex: 85.00" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500">
+            </div>
+            <!-- Fator Cubagem -->
+            <div>
+                <label for="fator-cubagem" class="block text-sm font-medium text-gray-700">Fator de Cubagem</label>
+                <input type="number" step="0.01" id="fator-cubagem" value="300.0" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required>
+            </div>
+            <!-- Valor Frete -->
+            <div class="md:col-span-2">
+                <label for="valor-frete" class="block text-sm font-medium text-gray-700">Valor Final do Frete (R$)</label>
+                <input type="number" step="0.01" id="valor-frete" placeholder="Ex: 12500.00" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required>
+            </div>
+        </div>
+
+        <h2 class="text-xl font-semibold text-gray-800 pt-4 border-t mt-6">Atribuições e Status</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <!-- Caminhão ID -->
+            <div>
+                <label for="caminhao-id" class="block text-sm font-medium text-gray-700">ID do Caminhão Designado</label>
+                <input type="number" id="caminhao-id" placeholder="Ex: 101" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required>
+            </div>
+            <!-- Motorista ID -->
+            <div>
+                <label for="motorista-id" class="block text-sm font-medium text-gray-700">ID do Motorista</label>
+                <input type="number" id="motorista-id" placeholder="Ex: 5" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required>
+            </div>
+            <!-- Percurso ID -->
+            <div>
+                <label for="percurso-id" class="block text-sm font-medium text-gray-700">ID do Percurso (Viagem)</label>
+                <input type="number" id="percurso-id" placeholder="Ex: 1001" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500">
+            </div>
+            <!-- Caixa ID -->
+            <div>
+                <label for="caixa-id" class="block text-sm font-medium text-gray-700">ID da Caixa Padronizada (Opcional)</label>
+                <input type="number" id="caixa-id" placeholder="Ex: 20" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500">
+            </div>
+            <!-- Status -->
+            <div>
+                <label for="solicitacao-status" class="block text-sm font-medium text-gray-700">Status da Entrega</label>
+                <select id="solicitacao-status" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required>
+                    <option value="">Selecione o Status</option>
+                    <option value="AGENDADA">Agendada</option>
+                    <option value="COLETA">Coleta em Andamento</option>
+                    <option value="PROCESSAMENTO">Em Processamento</option>
+                    <option value="A_CAMINHO">A Caminho</option>
+                    <option value="ENTREGUE">Entregue</option>
+                    <option value="CANCELADA">Cancelada</option>
+                </select>
+            </div>
+        </div>
+
+        <h2 class="text-xl font-semibold text-gray-800 pt-4 border-t mt-6">Registro de Datas/Horas</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <!-- Horario Coleta Programado -->
+            <div>
+                <label for="horario-coleta-programado" class="block text-sm font-medium text-gray-700">Coleta Programada</label>
+                <input type="datetime-local" id="horario-coleta-programado" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500" required>
+            </div>
+            <!-- Data Hora Coleta -->
+            <div>
+                <label for="data-hora-coleta" class="block text-sm font-medium text-gray-700">Coleta Efetiva</label>
+                <input type="datetime-local" id="data-hora-coleta" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500">
+            </div>
+            <!-- Data Hora Processamento -->
+            <div>
+                <label for="data-hora-processamento" class="block text-sm font-medium text-gray-700">Início Processamento</label>
+                <input type="datetime-local" id="data-hora-processamento" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500">
+            </div>
+            <!-- Data Hora A Caminho -->
+            <div>
+                <label for="data-hora-a-caminho" class="block text-sm font-medium text-gray-700">Saída para Entrega</label>
+                <input type="datetime-local" id="data-hora-a-caminho" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500">
+            </div>
+            <!-- Data Hora Entregue -->
+            <div>
+                <label for="data-hora-entregue" class="block text-sm font-medium text-gray-700">Entrega Finalizada</label>
+                <input type="datetime-local" id="data-hora-entregue" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500">
+            </div>
+        </div>
+
+        <!-- Observações -->
+        <div>
+            <label for="solicitacao-observacoes" class="block text-sm font-medium text-gray-700">Observações Gerais</label>
+            <textarea id="solicitacao-observacoes" rows="3" placeholder="Insira quaisquer observações importantes sobre a solicitação, requisitos especiais, etc." class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-pink-500 focus:ring-pink-500"></textarea>
+        </div>
+
+        <!-- Botão de Ação -->
+        <div class="pt-5">
+            <button type="submit" class="w-full px-6 py-3 bg-pink-600 text-white font-semibold rounded-lg shadow-lg hover:bg-pink-700 transition duration-200">
+                Registrar Solicitação
+            </button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

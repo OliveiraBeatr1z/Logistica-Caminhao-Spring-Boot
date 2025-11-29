@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Avaliação</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-4 sm:p-8 bg-gray-50 min-h-screen">
+<div class="max-w-3xl mx-auto bg-white shadow-xl rounded-xl p-6 md:p-8 border border-indigo-100">
+    <h1 class="text-2xl sm:text-3xl font-bold text-indigo-700 mb-6 border-b pb-2">
+        Formulário: Avaliação
+    </h1>
+    <form class="space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Solicitacao ID -->
+            <div>
+                <label for="avaliacao-solicitacao-id" class="block text-sm font-medium text-gray-700">ID da Solicitação de Transporte</label>
+                <input type="number" id="avaliacao-solicitacao-id" placeholder="Ex: 456" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-indigo-500 focus:ring-indigo-500" required>
+            </div>
+        </div>
+
+        <h2 class="text-xl font-semibold text-gray-800 pt-4 border-t mt-4">Avaliação do Cliente</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Nota Cliente -->
+            <div>
+                <label for="nota-cliente" class="block text-sm font-medium text-gray-700">Nota do Cliente (1-5)</label>
+                <input type="number" id="nota-cliente" min="1" max="5" placeholder="Ex: 5" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-indigo-500 focus:ring-indigo-500" required>
+            </div>
+            <!-- Data Avaliação Cliente -->
+            <div>
+                <label for="data-avaliacao-cliente" class="block text-sm font-medium text-gray-700">Data e Hora da Avaliação do Cliente</label>
+                <input type="datetime-local" id="data-avaliacao-cliente" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-indigo-500 focus:ring-indigo-500" required>
+            </div>
+        </div>
+        <!-- Comentário Cliente -->
+        <div>
+            <label for="comentario-cliente" class="block text-sm font-medium text-gray-700">Comentário do Cliente</label>
+            <textarea id="comentario-cliente" rows="3" placeholder="Insira o comentário do cliente aqui..." class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+        </div>
+
+        <h2 class="text-xl font-semibold text-gray-800 pt-4 border-t mt-6">Avaliação do Recebedor</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Nota Recebedor -->
+            <div>
+                <label for="nota-recebedor" class="block text-sm font-medium text-gray-700">Nota do Recebedor (1-5)</label>
+                <input type="number" id="nota-recebedor" min="1" max="5" placeholder="Ex: 4" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-indigo-500 focus:ring-indigo-500" required>
+            </div>
+            <!-- Data Avaliação Recebedor -->
+            <div>
+                <label for="data-avaliacao-recebedor" class="block text-sm font-medium text-gray-700">Data e Hora da Avaliação do Recebedor</label>
+                <input type="datetime-local" id="data-avaliacao-recebedor" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-indigo-500 focus:ring-indigo-500" required>
+            </div>
+        </div>
+        <!-- Comentário Recebedor -->
+        <div>
+            <label for="comentario-recebedor" class="block text-sm font-medium text-gray-700">Comentário do Recebedor</label>
+            <textarea id="comentario-recebedor" rows="3" placeholder="Insira o comentário do recebedor aqui..." class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+        </div>
+
+        <!-- Botão de Ação -->
+        <div class="pt-5">
+            <button type="submit" class="w-full px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:bg-indigo-700 transition duration-200">
+                Salvar Avaliação
+            </button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

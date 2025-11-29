@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Pagamento</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-4 sm:p-8 bg-gray-50 min-h-screen">
+<div class="max-w-3xl mx-auto bg-white shadow-xl rounded-xl p-6 md:p-8 border border-teal-100">
+    <h1 class="text-2xl sm:text-3xl font-bold text-teal-700 mb-6 border-b pb-2">
+        Formulário: Pagamento
+    </h1>
+    <form class="space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <!-- Solicitacao ID -->
+            <div>
+                <label for="pagamento-solicitacao-id" class="block text-sm font-medium text-gray-700">ID da Solicitação de Transporte</label>
+                <input type="number" id="pagamento-solicitacao-id" placeholder="Ex: 456" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-teal-500 focus:ring-teal-500" required>
+            </div>
+            <!-- Valor -->
+            <div>
+                <label for="pagamento-valor" class="block text-sm font-medium text-gray-700">Valor (R$)</label>
+                <input type="number" step="0.01" id="pagamento-valor" placeholder="Ex: 550.00" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-teal-500 focus:ring-teal-500" required>
+            </div>
+            <!-- Status -->
+            <div>
+                <label for="pagamento-status" class="block text-sm font-medium text-gray-700">Status do Pagamento</label>
+                <select id="pagamento-status" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-teal-500 focus:ring-teal-500" required>
+                    <option value="">Selecione o Status</option>
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="CONFIRMADO">Confirmado</option>
+                    <option value="CANCELADO">Cancelado</option>
+                    <option value="FALHA">Falha</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Método Pagamento -->
+            <div>
+                <label for="metodo-pagamento" class="block text-sm font-medium text-gray-700">Método de Pagamento</label>
+                <input type="text" id="metodo-pagamento" placeholder="Ex: PIX, Cartão de Crédito" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-teal-500 focus:ring-teal-500" required>
+            </div>
+            <!-- Transação ID -->
+            <div>
+                <label for="transacao-id" class="block text-sm font-medium text-gray-700">ID da Transação (Gateway)</label>
+                <input type="text" id="transacao-id" placeholder="Ex: TXN123456789" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-teal-500 focus:ring-teal-500" required>
+            </div>
+        </div>
+
+        <h2 class="text-xl font-semibold text-gray-800 pt-4 border-t mt-6">Datas de Ocorrência</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <!-- Data Criação -->
+            <div>
+                <label for="data-criacao" class="block text-sm font-medium text-gray-700">Data de Criação</label>
+                <input type="datetime-local" id="data-criacao" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-teal-500 focus:ring-teal-500" required>
+            </div>
+            <!-- Data Confirmação -->
+            <div>
+                <label for="data-confirmacao" class="block text-sm font-medium text-gray-700">Data de Confirmação</label>
+                <input type="datetime-local" id="data-confirmacao" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-teal-500 focus:ring-teal-500">
+            </div>
+            <!-- Data Cancelamento -->
+            <div>
+                <label for="data-cancelamento" class="block text-sm font-medium text-gray-700">Data de Cancelamento</label>
+                <input type="datetime-local" id="data-cancelamento" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-teal-500 focus:ring-teal-500">
+            </div>
+        </div>
+
+        <!-- Observações -->
+        <div>
+            <label for="pagamento-observacoes" class="block text-sm font-medium text-gray-700">Observações Adicionais</label>
+            <textarea id="pagamento-observacoes" rows="3" placeholder="Insira observações sobre o pagamento, se houver." class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm p-2.5 focus:border-teal-500 focus:ring-teal-500"></textarea>
+        </div>
+
+        <!-- Botão de Ação -->
+        <div class="pt-5">
+            <button type="submit" class="w-full px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg shadow-lg hover:bg-teal-700 transition duration-200">
+                Salvar Pagamento
+            </button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

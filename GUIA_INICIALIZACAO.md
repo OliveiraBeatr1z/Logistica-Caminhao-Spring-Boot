@@ -24,7 +24,7 @@ Edite o arquivo `src/main/resources/application.properties` se suas credenciais 
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/frota?createDatabaseIfNotExist=true
 spring.datasource.username=root
-spring.datasource.password=cco123  # <-- Altere se necessário
+spring.datasource.password=8250  # <-- Altere se necessário
 ```
 
 **Observação**: O banco de dados `frota` será criado automaticamente na primeira execução!
