@@ -23,9 +23,6 @@ import jakarta.validation.Valid;
 @Controller
 @RequestMapping("/solicitacoes")
 public class SolicitacaoController {
-
-    @Autowired
-    private FreightService freightService;
     
     @Autowired
     private SolicitacaoTransporteRepository repository;
@@ -106,11 +103,16 @@ public class SolicitacaoController {
 
     @GetMapping("/atualizar/{id}")
     public String mostrarFormularioAtualizar(@PathVariable("id") Long id, Model model) {
-        SolicitacaoTransporte solicitacao = repository.findById(id).orElse(null);
-        model.addAttribute("solicitacao", solicitacao);
-        model.addAttribute("caixas", caixaService.getAllCaixas());
-        model.addAttribute("caminhoes", caminhaoService.procurarTodos());
-        return "solicitacao/atualizar";
+        try {
+            SolicitacaoTransporte solicitacao = solicitacaoService.buscarPorId(id);
+            model.addAttribute("solicitacao", solicitacao);
+            model.addAttribute("caixas", caixaService.getAllCaixas());
+            model.addAttribute("caminhoes", caminhaoService.procurarTodos());
+            return "solicitacao/atualizar";
+        } catch (RuntimeException e) {
+            model.addAttribute("error", "Solicitação não encontrada: " + e.getMessage());
+            return "redirect:/solicitacoes/mostrar";
+        }
     }
 
     @PostMapping("/atualizar/{id}")

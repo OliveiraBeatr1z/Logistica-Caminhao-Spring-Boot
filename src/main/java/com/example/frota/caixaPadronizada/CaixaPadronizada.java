@@ -82,8 +82,6 @@ public class CaixaPadronizada {
             this.limitePeso = dados.limitePeso();
         if (dados.valorCaixa() != null)
             this.valorCaixa = dados.valorCaixa();
-        if (dados.limitePeso() != null)
-            this.limitePeso = dados.limitePeso();
     }
 
     public double getVolume() {

@@ -1,16 +1,16 @@
 package com.example.frota.solicitacaoTransporte;
 
 import com.example.frota.caminhao.Caminhao;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.example.frota.enums.StatusEntrega;
+import com.example.frota.motorista.Motorista;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "solicitacao_transporte")
@@ -63,6 +63,44 @@ public class SolicitacaoTransporte {
     // fator de cubagem (padrão: 300 kg/m³)
     private double fatorCubagem = 300.0;
 
+    // ========== NOVOS CAMPOS PARTE 2 ==========
+
+    // Status da entrega (4 etapas)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusEntrega status = StatusEntrega.COLETA;
+
+    // Motorista responsável pela entrega
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "motorista_id")
+    private Motorista motorista;
+
+    // Percurso/viagem associado
+    @Column(name = "percurso_id")
+    private Long percursoId;
+
+    // Horário programado para coleta
+    private LocalDateTime horarioColetaProgramado;
+
+    // Horários de cada etapa
+    private LocalDateTime dataHoraColeta;
+    private LocalDateTime dataHoraProcessamento;
+    private LocalDateTime dataHoraACaminho;
+    private LocalDateTime dataHoraEntregue;
+
+    // Nome do cliente solicitante
+    private String nomeCliente;
+    private String telefoneCliente;
+    private String emailCliente;
+
+    // Nome do recebedor
+    private String nomeRecebedor;
+    private String telefoneRecebedor;
+
+    // Observações
+    @Column(length = 2000)
+    private String observacoes;
+
     public SolicitacaoTransporte(DadosCadastroSolicitacao dados) {
         this.produto = dados.produto();
         this.comprimento = dados.comprimento();
@@ -77,6 +115,14 @@ public class SolicitacaoTransporte {
         this.destinoEndereco = dados.destinoEndereco();
         this.caixaId = dados.caixaId();
         this.caminhaoId = dados.caminhaoId();
+        this.horarioColetaProgramado = dados.horarioColetaProgramado();
+        this.nomeCliente = dados.nomeCliente();
+        this.telefoneCliente = dados.telefoneCliente();
+        this.emailCliente = dados.emailCliente();
+        this.nomeRecebedor = dados.nomeRecebedor();
+        this.telefoneRecebedor = dados.telefoneRecebedor();
+        this.observacoes = dados.observacoes();
+        this.status = StatusEntrega.COLETA;
     }
 
     public void atualizarInformacoes(DadosAtualizacaoSolicitacao dados) {
@@ -135,5 +181,66 @@ public class SolicitacaoTransporte {
     public boolean validarDimensoes(Caminhao caminhao) {
         return caminhao.podeTransportarPeso(calcularPesoConsiderado()) &&
                caminhao.podeTransportarVolume(this.comprimento, this.largura, this.altura);
+    }
+
+    // ========== MÉTODOS PARA CONTROLE DE STATUS ==========
+
+    /**
+     * Avança para o próximo status e registra a data/hora
+     */
+    public void avancarStatus() {
+        StatusEntrega proximoStatus = this.status.proximo();
+        if (proximoStatus != this.status) {
+            registrarHorarioStatus(proximoStatus);
+            this.status = proximoStatus;
+        }
+    }
+
+    /**
+     * Atualiza para um status específico
+     */
+    public void atualizarStatus(StatusEntrega novoStatus) {
+        registrarHorarioStatus(novoStatus);
+        this.status = novoStatus;
+    }
+
+    /**
+     * Registra o horário da mudança de status
+     */
+    private void registrarHorarioStatus(StatusEntrega status) {
+        LocalDateTime agora = LocalDateTime.now();
+        switch (status) {
+            case COLETA -> this.dataHoraColeta = agora;
+            case EM_PROCESSAMENTO -> this.dataHoraProcessamento = agora;
+            case A_CAMINHO -> this.dataHoraACaminho = agora;
+            case ENTREGUE -> this.dataHoraEntregue = agora;
+        }
+    }
+
+    /**
+     * Atribui um motorista à solicitação
+     */
+    public void atribuirMotorista(Motorista motorista) {
+        if (motorista == null || !motorista.estaDisponivel()) {
+            throw new IllegalArgumentException("Motorista inválido ou indisponível");
+        }
+        this.motorista = motorista;
+    }
+
+    /**
+     * Verifica se a entrega foi finalizada
+     */
+    public boolean estaFinalizada() {
+        return this.status.isFinalizado();
+    }
+
+    /**
+     * Calcula o tempo decorrido desde a criação até a entrega
+     */
+    public Long calcularTempoTotalEntrega() {
+        if (dataHoraColeta == null || dataHoraEntregue == null) {
+            return null;
+        }
+        return java.time.Duration.between(dataHoraColeta, dataHoraEntregue).toMinutes();
     }
 }
