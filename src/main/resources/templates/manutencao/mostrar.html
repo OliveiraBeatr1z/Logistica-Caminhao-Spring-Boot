@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/head :: head('Histórico de Manutenções')}"></head>
+<body>
+    <header th:replace="~{fragmentos/header :: header(activePage='Manutencao')}"></header>
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+            <h2>Histórico de Manutenções</h2>
+            <div>
+                <a th:href="@{/manutencoes/alertas}" class="btn btn-warning">
+                    <i class="fas fa-exclamation-triangle"></i> Ver Alertas
+                </a>
+                <a th:href="@{/manutencoes/cadastrar}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Nova Manutenção
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${manutencoes.isEmpty()}" class="alert alert-info">
+            Nenhuma manutenção registrada.
+        </div>
+
+        <div th:if="${!manutencoes.isEmpty()}" class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Caminhão</th>
+                        <th>Tipo</th>
+                        <th>Data</th>
+                        <th>Km</th>
+                        <th>Próxima Manutenção</th>
+                        <th>Custo</th>
+                        <th>Oficina</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="manutencao : ${manutencoes}">
+                        <td th:text="${manutencao.id()}"></td>
+                        <td>
+                            <strong th:text="${manutencao.caminhaoModelo()}"></strong><br>
+                            <small th:text="${manutencao.caminhaoPlaca()}"></small>
+                        </td>
+                        <td>
+                            <span class="badge badge-primary" th:text="${manutencao.tipoDescricao()}"></span>
+                        </td>
+                        <td th:text="${#temporals.format(manutencao.dataManutencao(), 'dd/MM/yyyy')}"></td>
+                        <td th:text="${#numbers.formatInteger(manutencao.kmManutencao(), 0, 'DEFAULT')} + ' km'"></td>
+                        <td>
+                            <span th:if="${manutencao.proximaManutencaoKm() != null}"
+                                  th:text="${#numbers.formatInteger(manutencao.proximaManutencaoKm(), 0, 'DEFAULT')} + ' km'">
+                            </span>
+                            <span th:if="${manutencao.proximaManutencaoKm() == null}">-</span>
+                        </td>
+                        <td th:text="${manutencao.custo() != null ? 'R$ ' + #numbers.formatDecimal(manutencao.custo(), 1, 2) : '-'}"></td>
+                        <td th:text="${manutencao.oficina() != null ? manutencao.oficina() : '-'}"></td>
+                        <td>
+                            <form th:action="@{/manutencoes/deletar/{id}(id=${manutencao.id()})}" 
+                                  method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Tem certeza que deseja excluir?')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div th:replace="~{fragmentos/footer :: footer}"></div>
+</body>
+</html>
+

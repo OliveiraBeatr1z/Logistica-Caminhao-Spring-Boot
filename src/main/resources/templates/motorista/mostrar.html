@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/head :: head('Motoristas')}"></head>
+<body>
+    <header th:replace="~{fragmentos/header :: header(activePage='Motorista')}"></header>
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+            <h2 th:text="${titulo != null ? titulo : 'Lista de Motoristas'}">Lista de Motoristas</h2>
+            <a th:href="@{/motoristas/cadastrar}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Novo Motorista
+            </a>
+        </div>
+        
+        <div class="mb-3">
+            <a th:href="@{/motoristas/mostrar}" class="btn btn-outline-secondary btn-sm">Todos</a>
+            <a th:href="@{/motoristas/disponiveis}" class="btn btn-outline-success btn-sm">Disponíveis</a>
+        </div>
+
+        <div th:if="${motoristas.isEmpty()}" class="alert alert-info">
+            Nenhum motorista cadastrado.
+        </div>
+
+        <div th:if="${!motoristas.isEmpty()}" class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>CNH</th>
+                        <th>Categoria</th>
+                        <th>Validade CNH</th>
+                        <th>Status</th>
+                        <th>CNH Válida</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="motorista : ${motoristas}">
+                        <td th:text="${motorista.id()}"></td>
+                        <td th:text="${motorista.nome()}"></td>
+                        <td th:text="${motorista.cpf()}"></td>
+                        <td th:text="${motorista.cnh()}"></td>
+                        <td th:text="${motorista.categoriaCnh()}"></td>
+                        <td th:text="${#temporals.format(motorista.validadeCnh(), 'dd/MM/yyyy')}"></td>
+                        <td>
+                            <span th:if="${motorista.ativo()}" class="badge badge-success">Ativo</span>
+                            <span th:if="${!motorista.ativo()}" class="badge badge-secondary">Inativo</span>
+                        </td>
+                        <td>
+                            <span th:if="${motorista.cnhValida()}" class="badge badge-success">Válida</span>
+                            <span th:if="${!motorista.cnhValida()}" class="badge badge-danger">Vencida</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/motoristas/mostrar/{id}(id=${motorista.id()})}" 
+                               class="btn btn-info btn-sm">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a th:href="@{/motoristas/atualizar/{id}(id=${motorista.id()})}" 
+                               class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form th:action="@{/motoristas/inativar/{id}(id=${motorista.id()})}" 
+                                  method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-secondary btn-sm"
+                                        th:if="${motorista.ativo()}"
+                                        onclick="return confirm('Deseja inativar este motorista?')">
+                                    <i class="fas fa-ban"></i>
+                                </button>
+                            </form>
+                            <form th:action="@{/motoristas/deletar/{id}(id=${motorista.id()})}" 
+                                  method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Tem certeza que deseja excluir?')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div th:replace="~{fragmentos/footer :: footer}"></div>
+</body>
+</html>
+

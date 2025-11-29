@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/head :: head('Alertas de Manutenção')}"></head>
+<body>
+    <header th:replace="~{fragmentos/header :: header(activePage='Manutencao')}"></header>
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+            <h2><i class="fas fa-exclamation-triangle"></i> Alertas de Manutenção</h2>
+            <a th:href="@{/manutencoes/mostrar}" class="btn btn-secondary">
+                <i class="fas fa-list"></i> Ver Histórico
+            </a>
+        </div>
+
+        <div th:if="${alertas.isEmpty()}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i> Nenhum alerta! Todos os caminhões estão em dia com a manutenção.
+        </div>
+
+        <div th:if="${!alertas.isEmpty()}">
+            <div class="row">
+                <div class="col-md-12">
+                    <div th:each="alerta : ${alertas}" 
+                         th:classappend="${alerta.nivel().toString() == 'CRITICO' ? 'alert alert-danger' : 'alert alert-warning'}"
+                         class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5>
+                                    <i th:if="${alerta.nivel().toString() == 'CRITICO'}" class="fas fa-exclamation-circle"></i>
+                                    <i th:if="${alerta.nivel().toString() == 'AVISO'}" class="fas fa-exclamation-triangle"></i>
+                                    <span th:text="${alerta.tipo().descricao}"></span>
+                                </h5>
+                                <p class="mb-1"><strong>Mensagem:</strong> <span th:text="${alerta.mensagem}"></span></p>
+                                <p class="mb-1"><strong>Km Atual:</strong> <span th:text="${#numbers.formatInteger(alerta.kmAtual, 0, 'DEFAULT')}"></span> km</p>
+                                <p class="mb-0"><strong>Km desde última manutenção:</strong> <span th:text="${#numbers.formatInteger(alerta.kmDesdeUltima, 0, 'DEFAULT')}"></span> km</p>
+                            </div>
+                            <div>
+                                <a th:href="@{/manutencoes/cadastrar}" class="btn btn-primary">
+                                    <i class="fas fa-tools"></i> Agendar Manutenção
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-info-circle"></i> Informações</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>Manutenção Preventiva:</strong> A cada 10.000 km (troca de óleos, filtros e pastilhas)</li>
+                    <li><strong>Troca de Pneus:</strong> A cada 70.000 km</li>
+                    <li><strong>Alerta AVISO:</strong> Quando faltam 1.000 km ou 5.000 km para a manutenção</li>
+                    <li><strong>Alerta CRÍTICO:</strong> Quando a manutenção está atrasada</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{fragmentos/footer :: footer}"></div>
+</body>
+</html>
+

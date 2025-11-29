@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/head :: head('Detalhes da Solicitação')}"></head>
+<body>
+    <header th:replace="~{fragmentos/header :: header(activePage='Solicitacao')}"></header>
+    <div class="container-fluid" style="max-width: 1000px; margin: 0 auto;">
+        <h2 class="text-center">Detalhes da Solicitação de Transporte</h2>
+        
+        <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+                <h4>Solicitação #<span th:text="${solicitacao.id}"></span> - <span th:text="${solicitacao.produto}"></span></h4>
+            </div>
+            <div class="card-body">
+                <h5>Informações do Produto</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Produto:</strong> <span th:text="${solicitacao.produto}"></span></p>
+                        <p><strong>Peso Real:</strong> <span th:text="${#numbers.formatDecimal(solicitacao.pesoReal, 1, 2)} + ' kg'"></span></p>
+                        <p><strong>Peso Cubado:</strong> <span th:text="${detalhe != null ? #numbers.formatDecimal(detalhe.pesoCubado, 1, 2) + ' kg' : '-'}"></span></p>
+                        <p><strong>Peso Considerado:</strong> 
+                            <span class="badge badge-warning" th:text="${detalhe != null ? #numbers.formatDecimal(detalhe.pesoConsiderado, 1, 2) + ' kg' : '-'}"></span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Dimensões (C x L x A):</strong> 
+                            <span th:text="${#numbers.formatDecimal(solicitacao.comprimento, 1, 2)} + ' x ' + 
+                                          ${#numbers.formatDecimal(solicitacao.largura, 1, 2)} + ' x ' + 
+                                          ${#numbers.formatDecimal(solicitacao.altura, 1, 2)} + ' m'"></span>
+                        </p>
+                        <p><strong>Volume:</strong> 
+                            <span th:text="${#numbers.formatDecimal(solicitacao.volume, 1, 4)} + ' m³'"></span>
+                        </p>
+                    </div>
+                </div>
+                
+                <hr/>
+                <h5>Origem e Destino</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Origem:</strong> <span th:text="${solicitacao.origemEndereco}"></span></p>
+                        <p><small>Coordenadas: <span th:text="${solicitacao.origemLat} + ', ' + ${solicitacao.origemLon}"></span></small></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Destino:</strong> <span th:text="${solicitacao.destinoEndereco}"></span></p>
+                        <p><small>Coordenadas: <span th:text="${solicitacao.destinoLat} + ', ' + ${solicitacao.destinoLon}"></span></small></p>
+                    </div>
+                </div>
+                
+                <hr/>
+                <h5>Cálculo do Frete</h5>
+                <div class="row" th:if="${detalhe != null}">
+                    <div class="col-md-6">
+                        <p><strong>Distância:</strong> <span th:text="${#numbers.formatDecimal(detalhe.distanciaKm, 1, 2)} + ' km'"></span></p>
+                        <p><strong>Custo por Peso:</strong> <span th:text="'R$ ' + ${#numbers.formatDecimal(detalhe.custoPorPeso, 1, 2)}"></span></p>
+                        <p><strong>Custo por Caixa:</strong> <span th:text="${detalhe.custoPorCaixa != null ? 'R$ ' + #numbers.formatDecimal(detalhe.custoPorCaixa, 1, 2) : 'N/A'}"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Custo Base:</strong> <span th:text="'R$ ' + ${#numbers.formatDecimal(detalhe.custoBase, 1, 2)}"></span></p>
+                        <p><strong>Custo Km Rodado:</strong> <span th:text="'R$ ' + ${#numbers.formatDecimal(detalhe.custoKmRodado, 1, 2)}"></span></p>
+                        <p><strong>Pedágio:</strong> <span th:text="'R$ ' + ${#numbers.formatDecimal(detalhe.valorPedagio, 1, 2)}"></span></p>
+                    </div>
+                </div>
+                
+                <div class="alert alert-success text-center mt-3">
+                    <h4><strong>Valor Total do Frete:</strong> 
+                        <span th:text="${solicitacao.valorFrete != null ? 'R$ ' + #numbers.formatDecimal(solicitacao.valorFrete, 1, 2) : 'Não calculado'}"></span>
+                    </h4>
+                </div>
+                
+                <hr/>
+                <h5>Recursos Utilizados</h5>
+                <div class="row">
+                    <div class="col-md-6" th:if="${caixa != null}">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">Caixa Utilizada</h6>
+                                <p><strong>Material:</strong> <span th:text="${caixa.material}"></span></p>
+                                <p><strong>Dimensões:</strong> 
+                                    <span th:text="${#numbers.formatDecimal(caixa.comprimento, 1, 2)} + ' x ' + 
+                                                  ${#numbers.formatDecimal(caixa.largura, 1, 2)} + ' x ' + 
+                                                  ${#numbers.formatDecimal(caixa.altura, 1, 2)} + ' m'"></span>
+                                </p>
+                                <p><strong>Limite de Peso:</strong> <span th:text="${#numbers.formatDecimal(caixa.limitePeso, 1, 2)} + ' kg'"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" th:if="${caminhao != null}">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">Caminhão Utilizado</h6>
+                                <p><strong>Modelo:</strong> <span th:text="${caminhao.modelo}"></span></p>
+                                <p><strong>Placa:</strong> <span th:text="${caminhao.placa}"></span></p>
+                                <p><strong>Carga Máxima:</strong> <span th:text="${#numbers.formatDecimal(caminhao.cargaMaxima, 1, 2)} + ' kg'"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a th:href="@{/solicitacoes/atualizar/{id}(id=${solicitacao.id})}" class="btn btn-warning">Editar</a>
+                <a th:href="@{/solicitacoes/mostrar}" class="btn btn-secondary">Voltar</a>
+                <form th:action="@{/solicitacoes/deletar/{id}(id=${solicitacao.id})}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger" 
+                            onclick="return confirm('Tem certeza que deseja excluir esta solicitação?')">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{fragmentos/footer :: footer}"></div>
+</body>
+</html>
+

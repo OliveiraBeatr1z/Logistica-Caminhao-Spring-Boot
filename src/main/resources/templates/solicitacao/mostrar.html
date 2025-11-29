@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/head :: head('Solicitações de Transporte')}"></head>
+<body>
+    <header th:replace="~{fragmentos/header :: header(activePage='Solicitacao')}"></header>
+    <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+        <h2 class="text-center">Solicitações de Transporte</h2>
+        
+        <div class="mb-3 text-right">
+            <a th:href="@{/solicitacoes/cadastrar}" class="btn btn-primary">Nova Solicitação</a>
+        </div>
+
+        <table class="table table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Produto</th>
+                    <th>Dimensões</th>
+                    <th>Peso Real</th>
+                    <th>Origem → Destino</th>
+                    <th>Distância</th>
+                    <th>Valor Frete</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="solicitacao : ${solicitacoes}">
+                    <td th:text="${solicitacao.id}"></td>
+                    <td th:text="${solicitacao.produto}"></td>
+                    <td th:text="${#numbers.formatDecimal(solicitacao.comprimento, 1, 2)} + ' x ' + 
+                                  ${#numbers.formatDecimal(solicitacao.largura, 1, 2)} + ' x ' + 
+                                  ${#numbers.formatDecimal(solicitacao.altura, 1, 2)} + ' m'"></td>
+                    <td th:text="${#numbers.formatDecimal(solicitacao.pesoReal, 1, 2)} + ' kg'"></td>
+                    <td>
+                        <small th:text="${solicitacao.origemEndereco}"></small><br/>
+                        <small>→</small><br/>
+                        <small th:text="${solicitacao.destinoEndereco}"></small>
+                    </td>
+                    <td th:text="${solicitacao.distanciaKm != null ? #numbers.formatDecimal(solicitacao.distanciaKm, 1, 2) + ' km' : '-'}"></td>
+                    <td th:text="${solicitacao.valorFrete != null ? 'R$ ' + #numbers.formatDecimal(solicitacao.valorFrete, 1, 2) : '-'}"></td>
+                    <td>
+                        <a th:href="@{/solicitacoes/mostrar/{id}(id=${solicitacao.id})}" class="btn btn-info btn-sm">Detalhes</a>
+                        <a th:href="@{/solicitacoes/atualizar/{id}(id=${solicitacao.id})}" class="btn btn-warning btn-sm">Editar</a>
+                        <form th:action="@{/solicitacoes/deletar/{id}(id=${solicitacao.id})}" method="post" style="display: inline;">
+                            <button type="submit" class="btn btn-danger btn-sm" 
+                                    onclick="return confirm('Tem certeza que deseja excluir esta solicitação?')">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div th:if="${#lists.isEmpty(solicitacoes)}" class="alert alert-info text-center">
+            Nenhuma solicitação cadastrada.
+        </div>
+    </div>
+    <div th:replace="~{fragmentos/footer :: footer}"></div>
+</body>
+</html>
+

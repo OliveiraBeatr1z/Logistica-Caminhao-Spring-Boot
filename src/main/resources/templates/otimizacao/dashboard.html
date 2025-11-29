@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/head :: head('Otimização de Carga')}"></head>
+<body>
+    <header th:replace="~{fragmentos/header :: header(activePage='Otimizacao')}"></header>
+    <div class="container-fluid">
+        <div class="mt-4 mb-4">
+            <h2><i class="fas fa-chart-line"></i> Dashboard de Otimização de Carga</h2>
+            <p class="text-muted">Agrupe entregas para maximizar o uso dos caminhões e reduzir custos</p>
+        </div>
+
+        <!-- Estatísticas Rápidas -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h5><i class="fas fa-boxes"></i> Grupos Sugeridos</h5>
+                        <h2 th:text="${grupos.size()}">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5><i class="fas fa-map-marked-alt"></i> Regiões</h5>
+                        <h2 th:text="${porRegiao.size()}">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <h5><i class="fas fa-dollar-sign"></i> Economia Total</h5>
+                        <h2 th:text="'R$ ' + ${#numbers.formatDecimal(grupos.stream().mapToDouble(g -> g.economiaEstimada()).sum(), 1, 2)}">R$ 0,00</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grupos de Entrega Otimizados -->
+        <h3 class="mb-3"><i class="fas fa-truck-loading"></i> Grupos de Entrega Otimizados</h3>
+        
+        <div th:if="${grupos.isEmpty()}" class="alert alert-info">
+            <i class="fas fa-info-circle"></i> Não há solicitações pendentes para agrupar no momento.
+        </div>
+
+        <div th:if="${!grupos.isEmpty()}">
+            <div th:each="grupo, iterStat : ${grupos}" class="card mb-3">
+                <div class="card-header" th:classappend="${grupo.taxaUtilizacao() >= 80 ? 'bg-success text-white' : (grupo.taxaUtilizacao() >= 60 ? 'bg-warning' : 'bg-secondary text-white')}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-map-marker-alt"></i> Grupo [[${iterStat.index + 1}]] - [[${grupo.regiao()}]]
+                        </h5>
+                        <span class="badge badge-light" style="font-size: 1.1rem;">
+                            Taxa de Ocupação: [[${#numbers.formatDecimal(grupo.taxaUtilizacao(), 1, 1)}]]%
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-truck"></i> Caminhão Sugerido</h6>
+                            <p>
+                                <strong>[[${grupo.caminhao().modelo}]]</strong> - [[${grupo.caminhao().placa}]]<br>
+                                <small>Capacidade: [[${#numbers.formatDecimal(grupo.caminhao().cargaMaxima, 1, 0)}]] kg | 
+                                       Volume: [[${#numbers.formatDecimal(grupo.caminhao().calcularVolume(), 1, 2)}]] m³</small>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-calculator"></i> Economia Estimada</h6>
+                            <p>
+                                <strong class="text-success" style="font-size: 1.2rem;">R$ [[${#numbers.formatDecimal(grupo.economiaEstimada(), 1, 2)}]]</strong><br>
+                                <small>Economia ao agrupar entregas na mesma rota</small>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6><i class="fas fa-list"></i> Solicitações no Grupo ([[${grupo.solicitacoes().size()}]])</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Produto</th>
+                                    <th>Destino</th>
+                                    <th>Peso</th>
+                                    <th>Volume</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="sol : ${grupo.solicitacoes()}">
+                                    <td th:text="${sol.id}"></td>
+                                    <td th:text="${sol.produto}"></td>
+                                    <td th:text="${sol.destinoEndereco}"></td>
+                                    <td th:text="${#numbers.formatDecimal(sol.calcularPesoConsiderado(), 1, 2)} + ' kg'"></td>
+                                    <td th:text="${#numbers.formatDecimal(sol.calcularVolume(), 1, 4)} + ' m³'"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="text-right">
+                        <button class="btn btn-success">
+                            <i class="fas fa-check"></i> Aprovar Agrupamento
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Solicitações por Região -->
+        <h3 class="mt-5 mb-3"><i class="fas fa-globe-americas"></i> Solicitações por Região</h3>
+        <div class="row">
+            <div th:each="entry : ${porRegiao}" class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0"><i class="fas fa-map-marked"></i> [[${entry.key}]]</h6>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Total de Solicitações:</strong> [[${entry.value.size()}]]</p>
+                        <a th:href="@{/solicitacoes/mostrar}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye"></i> Ver Detalhes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{fragmentos/footer :: footer}"></div>
+</body>
+</html>
+

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/head :: head('Cadastrar Manutenção')}"></head>
+<body>
+    <header th:replace="~{fragmentos/header :: header(activePage='Manutencao')}"></header>
+    <div class="container-fluid" style="max-width: 900px; margin: 0 auto;">
+        <h2 class="text-center mt-4">Registrar Manutenção</h2>
+
+        <form th:action="@{/manutencoes/cadastrar}" method="post" style="margin-top: 30px;">
+            <h4>Informações Básicas</h4>
+            <div class="form-group">
+                <label for="caminhaoId">Caminhão:</label>
+                <select class="form-control" id="caminhaoId" name="caminhaoId" required>
+                    <option value="">Selecione o caminhão...</option>
+                    <option th:each="caminhao : ${caminhoes}" 
+                            th:value="${caminhao.id}" 
+                            th:text="${caminhao.modelo + ' - ' + caminhao.placa}">
+                    </option>
+                </select>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="tipo">Tipo de Manutenção:</label>
+                    <select class="form-control" id="tipo" name="tipo" required>
+                        <option value="">Selecione o tipo...</option>
+                        <option th:each="tipo : ${tiposManutencao}" 
+                                th:value="${tipo}" 
+                                th:text="${tipo.descricao}">
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="dataManutencao">Data da Manutenção:</label>
+                    <input type="date" class="form-control" id="dataManutencao" name="dataManutencao">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="kmManutencao">Quilometragem Atual:</label>
+                    <input type="number" class="form-control" id="kmManutencao" name="kmManutencao" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="custo">Custo (R$):</label>
+                    <input type="number" step="0.01" class="form-control" id="custo" name="custo">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="oficina">Oficina/Responsável:</label>
+                <input type="text" class="form-control" id="oficina" name="oficina">
+            </div>
+            
+            <div class="form-group">
+                <label for="descricao">Descrição dos Serviços:</label>
+                <textarea class="form-control" id="descricao" name="descricao" rows="4" required></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-lg btn-block">Registrar Manutenção</button>
+            <a th:href="@{/manutencoes/mostrar}" class="btn btn-secondary btn-block">Cancelar</a>
+        </form>
+    </div>
+    <div th:replace="~{fragmentos/footer :: footer}"></div>
+</body>
+</html>
+
