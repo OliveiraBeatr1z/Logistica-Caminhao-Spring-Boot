@@ -1,60 +1,296 @@
-# Frota — Cubagem e Cálculo de Frete
+# 🚚 FrotaLux - Sistema de Gestão de Frota e Logística
 
-Este projeto foi estendido para suportar cálculo de cubagem e uma lógica inicial de cálculo de frete.
+![Java](https://img.shields.io/badge/Java-21-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.5-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
-O que foi adicionado / alterado
-------------------------------
-- Projeto configurado para Java 21 no `pom.xml`.
-- Entidade `Caminhao` agora contém dimensões: `comprimento`, `largura`, `altura` (metros), e `fatorCubagem` (kg/m³). Também foram adicionados os métodos derivados `getVolume()` e `getPesoCubado()`.
-- Entidade `CaixaPadronizada` criada (dimensões, material, limitePeso) com repositório.
-- Entidade `SolicitacaoTransporte` criada para representar um pedido de transporte (produto, dimensões, peso real, origem/destino geográficos).
-- Serviço `FreightService` que:
-  - Calcula volume e peso cubado: Peso Cubado = Volume (m³) × Fator de Cubagem (padrão rodoviário 300 kg/m³).
-  - Compara peso real com peso cubado e considera para cobrança o maior dos dois.
-  - Permite cobrança por caixa (se o produto couber em uma das caixas padronizadas) ou por peso, e estima pedágio através de um `TollClient`.
-- Interfaces e implementações para distância/pedágio:
-  - `DistanceClient` (abstração) com implementação de fallback `HaversineDistanceClient`.
-  - `OpenRouteServiceClient` (esqueleto) que pode ser ativado via `routing.provider=ors` e `routing.ors.apiKey`.
-  - `TollClient` com uma implementação placeholder (`PlaceholderTollClient`) que usa um valor por km configurável.
-- Endpoints REST novos:
-  - POST `/solicitacoes/cotacao` — Retorna `{ "valor": number }` com o valor do frete estimado.
-  - POST `/solicitacoes` — Persiste a solicitação e retorna `{ "id": ..., "valor": ... }`.
+> Sistema completo de gestão de frota e logística com cálculo de frete baseado em cubagem, otimização de carga e controle preventivo de manutenção.
 
-Configuração
-------------
-Edite `src/main/resources/application.properties` para definir credenciais do banco e chaves de API caso necessário.
+---
 
-Propriedades principais adicionadas:
+## 📋 Índice
 
-- `routing.provider` — `haversine` (padrão) ou `ors` (OpenRouteService).
-- `routing.ors.apiKey` — chave da OpenRouteService (opcional). Se não fornecida, o fallback Haversine será usado.
-- `routing.toll.perKm` — taxa por km usada pelo `PlaceholderTollClient` quando nenhum provedor de pedágio estiver configurado.
-- `freight.rate.perKmPerBox` — exemplo de preço por caixa por km.
-- `freight.rate.perKgPerKm` — exemplo de preço por kg por km.
+- [Sobre o Projeto](#-sobre-o-projeto)
+- [Funcionalidades](#-funcionalidades)
+- [Tecnologias](#-tecnologias)
+- [Arquitetura](#-arquitetura)
+- [Instalação](#-instalação)
+- [Como Usar](#-como-usar)
+- [API REST](#-api-rest)
+- [Estrutura do Projeto](#-estrutura-do-projeto)
+- [Documentação](#-documentação)
 
-Como executar
--------------
-Verifique se você tem um JDK instalado (o projeto mira Java 21). O Maven wrapper usará o JDK do sistema.
+---
 
-No PowerShell (Windows):
+## 🎯 Sobre o Projeto
 
-```powershell
-cd c:\Users\bea47\Downloads\frota\frota
-.\mvnw -DskipTests package
-.\mvnw spring-boot:run
+O **FrotaLux** é um sistema completo de gestão de frota desenvolvido em **Spring Boot** que implementa:
+
+- ✅ **Cálculo de frete inteligente** baseado em cubagem (300 kg/m³)
+- ✅ **Sistema de manutenção preventiva** automática (10.000 km e 70.000 km)
+- ✅ **Otimização de carga** com algoritmo de agrupamento
+- ✅ **Rastreamento em 4 etapas** (Coleta → Processamento → A Caminho → Entregue)
+- ✅ **Gestão de motoristas** com validação de CNH
+- ✅ **Sistema de pagamento** completo
+- ✅ **Avaliações** de cliente e recebedor
+- ✅ **API REST** para integração mobile
+
+---
+
+## ⚡ Funcionalidades
+
+### 📦 Gestão de Frota
+
+#### **1. Caminhões**
+- Cadastro completo (modelo, placa, marca, ano)
+- Dimensões (comprimento, largura, altura)
+- Fator de cubagem (300 kg/m³)
+- Cálculo automático de volume e peso cubado
+- Valor por km rodado
+
+#### **2. Motoristas**
+- Cadastro com CPF e CNH
+- Validação de CNH (categoria e validade)
+- Status ativo/inativo
+- Rastreamento GPS em tempo real
+- Alertas de CNH vencendo (30 dias)
+
+#### **3. Caixas Padronizadas**
+- Dimensões e material
+- Limite de peso
+- Valor fixo por caixa
+- Validação automática de produtos
+
+---
+
+### 🚛 Gestão Logística
+
+#### **4. Solicitações de Transporte**
+- Cadastro de produto (dimensões e peso)
+- Origem e destino (coordenadas + endereços)
+- **Cálculo inteligente de frete**:
+  - Peso cubado vs peso real (usa o maior)
+  - Cobrança por peso OU por caixa (usa o menor)
+  - Taxa por km rodado
+  - Pedágio estimado
+- **4 etapas de rastreamento**:
+  1. 🟡 Coleta
+  2. 🔵 Em Processamento
+  3. 🟠 A Caminho da Entrega
+  4. 🟢 Entregue
+
+#### **5. Manutenção Preventiva** 🔧
+- **Sistema de alertas automáticos**:
+  - ⚠️ Alerta a cada **10.000 km** (óleo, filtros, pastilhas)
+  - ⚠️ Alerta a cada **70.000 km** (troca de pneus)
+- **Níveis de criticidade**:
+  - 🔴 **CRÍTICO**: Manutenção atrasada
+  - 🟡 **AVISO**: Faltam 1.000 km ou 5.000 km
+  - ℹ️ **INFORMATIVO**: Tudo em dia
+- Histórico completo de manutenções
+- Cálculo automático da próxima manutenção
+
+#### **6. Percursos/Viagens**
+- Registro de saída e chegada
+- Quilometragem inicial e final
+- Controle de combustível (litros e custo)
+- Cálculos automáticos:
+  - Distância percorrida
+  - Consumo médio (km/l)
+  - Custo por km
+
+---
+
+### 🎯 Otimização e Inteligência
+
+#### **7. Otimização de Carga** 📊
+- **Algoritmo inteligente de agrupamento**:
+  - Agrupa entregas por região
+  - Sugere melhor caminhão (minimiza desperdício)
+  - Calcula taxa de ocupação (peso + volume)
+  - Estima economia ao agrupar rotas
+- **Dashboard visual**:
+  - Grupos otimizados com cores
+  - Taxa de ocupação por grupo
+  - Economia total estimada
+  - Solicitações por região
+
+#### **8. Sistema de Pagamento** 💳
+- Criação automática ao solicitar transporte
+- Status: Pendente → Processando → Confirmado
+- Métodos: PIX, Cartão, Boleto
+- Webhooks para confirmação
+- Cálculo de receita por período
+
+#### **9. Avaliações e Feedback** ⭐
+- Cliente avalia a entrega (1-5 estrelas)
+- Recebedor avalia a entrega (1-5 estrelas)
+- Comentários opcionais
+- Média automática
+- Estatísticas gerais do serviço
+
+---
+
+## 🛠️ Tecnologias
+
+### Backend
+- **Java 21** - Linguagem de programação
+- **Spring Boot 3.5.5** - Framework principal
+- **Spring Data JPA** - Persistência de dados
+- **Hibernate** - ORM
+- **Lombok** - Redução de boilerplate
+- **Bean Validation** - Validações
+
+### Frontend
+- **Thymeleaf** - Template engine
+- **Bootstrap 4** - Framework CSS
+- **FontAwesome** - Ícones
+- **jQuery** - JavaScript library
+
+### Banco de Dados
+- **MySQL 8** - Banco de dados relacional
+- **HikariCP** - Pool de conexões
+
+### APIs Externas (Preparadas)
+- **Haversine** - Cálculo de distância (implementado)
+- **OpenRouteService** - Rotas reais (preparado)
+- **Google Maps** - Distância e pedágios (preparado)
+- **Twilio** - WhatsApp (preparado para integração)
+
+---
+
+## 🏗️ Arquitetura
+
+O projeto segue os princípios **SOLID** e **Clean Architecture**:
+
+```
+┌─────────────────────────────────────────┐
+│           Controllers (Web/API)         │
+├─────────────────────────────────────────┤
+│              Services                   │
+│    (Lógica de Negócio)                 │
+├─────────────────────────────────────────┤
+│            Repositories                 │
+│        (Acesso a Dados)                │
+├─────────────────────────────────────────┤
+│      Entidades (Domain Model)          │
+└─────────────────────────────────────────┘
 ```
 
-Se quiser garantir o uso do JDK 21, defina `JAVA_HOME` apontando para sua instalação do JDK 21 antes de executar os comandos.
+### Princípios SOLID Aplicados
 
-Exemplo de requisição para cotação (POST `/solicitacoes/cotacao`):
+- **S** - Single Responsibility: Cada classe tem uma única responsabilidade
+- **O** - Open/Closed: Extensível sem modificação (enums, interfaces)
+- **L** - Liskov Substitution: Interfaces implementadas corretamente
+- **I** - Interface Segregation: DTOs específicos para cada operação
+- **D** - Dependency Inversion: Injeção de dependências
 
-```json
+---
+
+## 📥 Instalação
+
+### Pré-requisitos
+
+- **Java 21** ou superior
+- **Maven 3.8+**
+- **MySQL 8.0+**
+- **Git**
+
+### Passo a Passo
+
+1. **Clone o repositório**
+```bash
+git clone https://github.com/seu-usuario/frotalux.git
+cd frotalux
+```
+
+2. **Configure o banco de dados**
+
+Crie um banco de dados MySQL:
+```sql
+CREATE DATABASE frota CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+3. **Configure o `application.properties`**
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/frota
+spring.datasource.username=seu_usuario
+spring.datasource.password=sua_senha
+```
+
+4. **Compile o projeto**
+```bash
+./mvnw clean install
+```
+
+5. **Execute a aplicação**
+```bash
+./mvnw spring-boot:run
+```
+
+6. **Acesse o sistema**
+```
+http://localhost:8083
+```
+
+---
+
+## 🚀 Como Usar
+
+### Interface Web
+
+#### **Dashboard Principal**
+```
+http://localhost:8083
+```
+
+#### **Gestão de Motoristas**
+```
+http://localhost:8083/motoristas/cadastrar  → Cadastrar novo motorista
+http://localhost:8083/motoristas/mostrar    → Listar todos
+http://localhost:8083/motoristas/disponiveis → Ver disponíveis
+```
+
+#### **Manutenção Preventiva**
+```
+http://localhost:8083/manutencoes/alertas   → Ver alertas (IMPORTANTE!)
+http://localhost:8083/manutencoes/mostrar   → Histórico
+http://localhost:8083/manutencoes/cadastrar → Registrar manutenção
+```
+
+#### **Otimização de Carga**
+```
+http://localhost:8083/otimizacao → Dashboard de otimização
+```
+
+#### **Solicitações de Transporte**
+```
+http://localhost:8083/solicitacoes/cadastrar → Nova solicitação
+http://localhost:8083/solicitacoes/mostrar   → Listar todas
+```
+
+---
+
+## 🔌 API REST
+
+### Base URL
+```
+http://localhost:8083/api
+```
+
+### Endpoints Principais
+
+#### **Cotação de Frete**
+```http
+POST /api/solicitacoes/cotacao
+Content-Type: application/json
+
 {
-  "produto": "Tênis",
-  "comprimento": 0.3,
-  "largura": 0.2,
-  "altura": 0.15,
-  "pesoReal": 1.2,
+  "produto": "Notebook",
+  "comprimento": 0.4,
+  "largura": 0.3,
+  "altura": 0.1,
+  "pesoReal": 2.5,
   "origemLat": -23.550520,
   "origemLon": -46.633308,
   "destinoLat": -22.903539,
@@ -62,22 +298,283 @@ Exemplo de requisição para cotação (POST `/solicitacoes/cotacao`):
 }
 ```
 
-APIs externas e observações
----------------------------
-- OpenRouteService (ORS): integração opcional. Ao definir `routing.provider=ors` e fornecer `routing.ors.apiKey`, o cliente ORS tentará obter a rota. A resposta do ORS precisa ser parseada para extrair a distância exata (implementação deixada como esqueleto nesta etapa — o cliente já realiza a chamada e faz fallback quando necessário).
+#### **Criar Solicitação**
+```http
+POST /api/solicitacoes
+Content-Type: application/json
 
-- Pedágio: o cálculo preciso de pedágio exige APIs específicas (Google Routes, HERE, Mapplus, ou serviços pagos do ORS). Nesta entrega incluí uma abstração `TollClient` e um `PlaceholderTollClient` que estima o pedágio por km. Posso implementar um `TollClient` para um provedor real se você fornecer a escolha e/ou as chaves.
+{
+  "produto": "Notebook",
+  "comprimento": 0.4,
+  "largura": 0.3,
+  "altura": 0.1,
+  "pesoReal": 2.5,
+  "origemLat": -23.550520,
+  "origemLon": -46.633308,
+  "destinoLat": -22.903539,
+  "destinoLon": -43.209587,
+  "nomeCliente": "João Silva",
+  "nomeRecebedor": "Maria Santos"
+}
+```
 
-O que não foi alterado
----------------------
-- Não atualizei o Spring Boot (mantive 3.5.5). Se desejar, posso preparar um plano de atualização de dependências.
-- A implementação completa de parsing de resposta do ORS e um `TollClient` de produção dependem de chaves e do formato de resposta do provedor — posso concluir assim que você indicar o provedor e fornecer as chaves (ou autorizar a leitura de variáveis de ambiente).
+#### **Atualizar Localização (App Motorista)**
+```http
+POST /api/motorista/{id}/localizacao
+Content-Type: application/json
 
-Próximos passos possíveis (me diga qual prefere)
------------------------------------------------
-- Implementar parsing completo do OpenRouteService para usar distância real de rota e (quando disponível) estimativas de pedágio.
-- Implementar client para HERE ou Google Routes para distâncias e pedágios (requer chaves).
-- Integrar as novas APIs na interface (ex.: escolher provedor via `routing.provider`) e adicionar fallback.
-- Atualizar as páginas Thymeleaf para permitir criação de solicitação via UI e mostrar opções de caixas e cotação.
+{
+  "latitude": -23.550520,
+  "longitude": -46.633308
+}
+```
 
-Se quiser que avance em qualquer uma dessas tarefas, diga qual delas e eu implemento.
+#### **Atualizar Status da Entrega**
+```http
+POST /api/entrega/{id}/status
+Content-Type: application/json
+
+{
+  "novoStatus": "A_CAMINHO"
+}
+```
+
+#### **Finalizar Entrega**
+```http
+POST /api/entrega/{id}/finalizar
+```
+
+#### **Cliente Avalia**
+```http
+POST /api/avaliacao/cliente
+Content-Type: application/json
+
+{
+  "solicitacaoId": 1,
+  "nota": 5,
+  "comentario": "Excelente serviço!"
+}
+```
+
+#### **Recebedor Avalia**
+```http
+POST /api/avaliacao/recebedor
+Content-Type: application/json
+
+{
+  "solicitacaoId": 1,
+  "nota": 4,
+  "comentario": "Entrega dentro do prazo"
+}
+```
+
+#### **Confirmar Pagamento**
+```http
+POST /api/pagamento/{id}/confirmar
+Content-Type: application/json
+
+{
+  "transacaoId": "TXN_123456789"
+}
+```
+
+---
+
+## 📂 Estrutura do Projeto
+
+```
+src/main/java/com/example/frota/
+├── api/                          # API REST
+│   └── MobileApiController.java
+├── avaliacao/                    # Sistema de Avaliações
+│   ├── Avaliacao.java
+│   ├── AvaliacaoRepository.java
+│   ├── AvaliacaoService.java
+│   └── [DTOs]
+├── caixaPadronizada/            # Caixas Padronizadas
+│   ├── CaixaPadronizada.java
+│   ├── CaixaPadronizadaController.java
+│   ├── CaixaPadronizadaService.java
+│   └── [DTOs]
+├── caminhao/                    # Gestão de Caminhões
+│   ├── Caminhao.java
+│   ├── CaminhaoController.java
+│   ├── CaminhaoService.java
+│   └── [DTOs]
+├── enums/                       # Enumerações
+│   ├── StatusEntrega.java
+│   ├── StatusPagamento.java
+│   └── TipoManutencao.java
+├── manutencao/                  # Sistema de Manutenção
+│   ├── Manutencao.java
+│   ├── ManutencaoController.java
+│   ├── ManutencaoService.java   # ⚠️ ALERTAS AUTOMÁTICOS
+│   └── [DTOs]
+├── motorista/                   # Gestão de Motoristas
+│   ├── Motorista.java
+│   ├── MotoristaController.java
+│   ├── MotoristaService.java
+│   └── [DTOs]
+├── otimizacao/                  # Otimização de Carga
+│   ├── OtimizacaoCargaService.java  # 🎯 ALGORITMO
+│   └── OtimizacaoController.java
+├── pagamento/                   # Sistema de Pagamento
+│   ├── Pagamento.java
+│   ├── PagamentoService.java
+│   └── [DTOs]
+├── percurso/                    # Controle de Viagens
+│   ├── Percurso.java
+│   ├── PercursoService.java
+│   └── [DTOs]
+└── solicitacaoTransporte/       # Solicitações
+    ├── SolicitacaoTransporte.java
+    ├── SolicitacaoController.java
+    ├── FreightService.java      # 💰 CÁLCULO DE FRETE
+    └── [DTOs]
+
+src/main/resources/
+├── templates/                   # Templates HTML
+│   ├── fragmentos/
+│   │   ├── header.html
+│   │   ├── footer.html
+│   │   └── head.html
+│   ├── motorista/
+│   │   ├── cadastrar.html
+│   │   └── mostrar.html
+│   ├── manutencao/
+│   │   ├── cadastrar.html
+│   │   ├── mostrar.html
+│   │   └── alertas.html         # 🔴 ALERTAS
+│   ├── otimizacao/
+│   │   └── dashboard.html       # 📊 DASHBOARD
+│   ├── solicitacao/
+│   │   ├── cadastrar.html
+│   │   ├── mostrar.html
+│   │   └── mostrar-detalhe.html
+│   └── caixa/
+│       ├── cadastrar.html
+│       └── mostrar.html
+└── application.properties       # Configurações
+```
+
+---
+
+## 📚 Documentação
+
+### Documentos Disponíveis
+
+- **[IMPLEMENTACAO.md](IMPLEMENTACAO.md)** - Documentação da Parte 1 (Cubagem e Frete)
+- **[IMPLEMENTACAO_PARTE2.md](IMPLEMENTACAO_PARTE2.md)** - Documentação da Parte 2 (Sistema Completo)
+- **[GUIA_INICIALIZACAO.md](GUIA_INICIALIZACAO.md)** - Guia de inicialização
+
+### Cálculo de Frete
+
+#### Fórmula do Peso Cubado
+```
+Peso Cubado = Volume (m³) × Fator de Cubagem (300 kg/m³)
+Volume = Comprimento × Largura × Altura
+```
+
+#### Peso Considerado
+```
+Peso Considerado = MAX(Peso Real, Peso Cubado)
+```
+
+#### Composição do Frete
+```
+Custo por Peso = Peso Considerado × Taxa/kg/km × Distância
+Custo por Caixa = Taxa/caixa/km × Distância
+Custo Base = MIN(Custo por Peso, Custo por Caixa)
+Custo Km Rodado = Taxa/km × Distância
+Frete Total = Custo Base + Custo Km Rodado + Pedágio
+```
+
+### Configurações
+
+#### application.properties
+```properties
+# Banco de Dados
+spring.datasource.url=jdbc:mysql://localhost:3306/frota
+spring.datasource.username=root
+spring.datasource.password=senha
+
+# Servidor
+server.port=8083
+
+# Rotas e APIs
+routing.provider=haversine
+routing.ors.apiKey=
+routing.toll.perKm=0.05
+
+# Preços de Frete
+freight.rate.perKmPerBox=2.0
+freight.rate.perKgPerKm=0.01
+freight.rate.perKm=1.5
+```
+
+---
+
+## 🎨 Screenshots
+
+### Dashboard de Otimização
+![Dashboard](docs/images/dashboard.png)
+
+### Alertas de Manutenção
+![Alertas](docs/images/alertas.png)
+
+### Solicitação de Transporte
+![Solicitação](docs/images/solicitacao.png)
+
+---
+
+## 🤝 Contribuindo
+
+Contribuições são bem-vindas! Por favor:
+
+1. Fork o projeto
+2. Crie uma branch (`git checkout -b feature/nova-funcionalidade`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova funcionalidade'`)
+4. Push para a branch (`git push origin feature/nova-funcionalidade`)
+5. Abra um Pull Request
+
+---
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
+
+## 👨‍💻 Autores
+
+- **Beatriz Silva** - *Desenvolvimento e Implementação*
+
+---
+
+## 🙏 Agradecimentos
+
+- Spring Boot Framework
+- Comunidade Java
+- Bootstrap Team
+- FontAwesome
+
+---
+
+## 📞 Contato
+
+Para dúvidas ou sugestões, entre em contato:
+
+- Email: contato@frotalux.com
+- GitHub: [@seu-usuario](https://github.com/seu-usuario)
+
+---
+
+<div align="center">
+
+**Desenvolvido com ❤️ usando Spring Boot**
+
+![Java](https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=java)
+![Spring](https://img.shields.io/badge/Spring%20Boot-3.5.5-brightgreen?style=for-the-badge&logo=spring)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?style=for-the-badge&logo=mysql)
+
+</div>
