@@ -101,6 +101,38 @@ public class MobileApiController {
     }
 
     /**
+     * Lista todas as avaliações
+     */
+    @GetMapping("/avaliacao")
+    public ResponseEntity<?> listarAvaliacoes() {
+        return ResponseEntity.ok(avaliacaoService.listarTodas());
+    }
+
+    /**
+     * Busca avaliação por ID
+     */
+    @GetMapping("/avaliacao/{id}")
+    public ResponseEntity<?> buscarAvaliacao(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(avaliacaoService.buscarPorId(id));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * Busca avaliação de uma solicitação específica
+     */
+    @GetMapping("/avaliacao/solicitacao/{solicitacaoId}")
+    public ResponseEntity<?> buscarAvaliacaoPorSolicitacao(@PathVariable Long solicitacaoId) {
+        var avaliacao = avaliacaoService.buscarPorSolicitacao(solicitacaoId);
+        if (avaliacao.isPresent()) {
+            return ResponseEntity.ok(avaliacao.get());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    /**
      * Cliente avalia a entrega
      */
     @PostMapping("/avaliacao/cliente")

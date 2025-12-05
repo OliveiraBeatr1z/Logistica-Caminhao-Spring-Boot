@@ -67,14 +67,6 @@ public class CaminhaoController {
         return "caminhao/formulario";
     }
 	
-//	// Para criação sem passar o ID
-//	@GetMapping("/formulario")
-//	public String novoCaminhao(Model model  ) {
-//		model.addAttribute("caminhao", new Caminhao());
-//		model.addAttribute("marcas", marcaService.procurarTodos());
-//		return "caminhao/formulario";
-//	}
-	
 	@GetMapping ("/formulario/{id}")    
 	public String carregaPaginaFormulario (@PathVariable("id") Long id, Model model,
 			RedirectAttributes redirectAttributes) {

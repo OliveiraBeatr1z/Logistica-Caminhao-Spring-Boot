@@ -8,7 +8,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.constraints.NotNull;
 
 @Service
 public class MarcaService {

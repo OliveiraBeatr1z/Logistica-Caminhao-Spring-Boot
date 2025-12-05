@@ -31,7 +31,7 @@ public class Caminhao {
 	@Column(name = "caminhao_id")
 	private Long id;
 	private String modelo;
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "marca_id", referencedColumnName = "marca_id")
 	private Marca marca;
 	private String placa;

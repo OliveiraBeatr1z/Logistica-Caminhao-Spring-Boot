@@ -273,10 +273,43 @@ http://localhost:8083/solicitacoes/mostrar   → Listar todas
 
 ## 🔌 API REST
 
+### 📋 Documentação Completa das APIs
+
+O sistema possui **66+ endpoints REST** completamente documentados:
+
+#### 📄 Documentos Disponíveis
+- **[ROTAS_API_POSTMAN.md](ROTAS_API_POSTMAN.md)** - Guia completo com todos os endpoints
+- **[Frotalux_Postman_Collection.json](Frotalux_Postman_Collection.json)** - Coleção para importar no Postman
+- **[RESUMO_ROTAS_REST.md](RESUMO_ROTAS_REST.md)** - Resumo executivo das APIs
+
+#### 🚀 Quick Start - Postman
+
+1. Importe a coleção: `Frotalux_Postman_Collection.json`
+2. Configure a variável `baseUrl = http://localhost:8080`
+3. Execute os endpoints!
+
 ### Base URL
 ```
-http://localhost:8083/api
+http://localhost:8080/api
 ```
+
+### 📦 Módulos de API
+
+| Módulo | Endpoints | Descrição |
+|--------|-----------|-----------|
+| **Caminhões** | 5 | CRUD completo de caminhões |
+| **Marcas** | 5 | Gestão de marcas de caminhões |
+| **Motoristas** | 4 | Cadastro e listagem de motoristas |
+| **Caixas** | 3 | Caixas padronizadas |
+| **Solicitações** | 4 | Criação e gestão de transportes |
+| **Percursos** | 6 | Controle de viagens |
+| **Manutenções** | 4 | Sistema de manutenção preventiva |
+| **Pagamentos** | 6 | Gestão de pagamentos |
+| **Avaliações** | 11 | Sistema duplo de avaliação |
+| **Otimização** | 3 | Algoritmo de otimização de carga |
+| **Rastreamento** | 5 | GPS e rastreamento em tempo real |
+| **Dashboard** | 5 | KPIs e estatísticas |
+| **API Mobile** | 5 | Endpoints para app do motorista |
 
 ### Endpoints Principais
 
@@ -463,9 +496,14 @@ src/main/resources/
 
 ### Documentos Disponíveis
 
+- **[ROTAS_API_POSTMAN.md](ROTAS_API_POSTMAN.md)** - Guia completo das APIs REST
+- **[RESUMO_ROTAS_REST.md](RESUMO_ROTAS_REST.md)** - Resumo executivo das 66+ APIs
+- **[Frotalux_Postman_Collection.json](Frotalux_Postman_Collection.json)** - Coleção do Postman
 - **[IMPLEMENTACAO.md](IMPLEMENTACAO.md)** - Documentação da Parte 1 (Cubagem e Frete)
 - **[IMPLEMENTACAO_PARTE2.md](IMPLEMENTACAO_PARTE2.md)** - Documentação da Parte 2 (Sistema Completo)
 - **[GUIA_INICIALIZACAO.md](GUIA_INICIALIZACAO.md)** - Guia de inicialização
+- **[ARQUITETURA_DUAL.md](ARQUITETURA_DUAL.md)** - Arquitetura Web + API
+- **[GUIA_ESTILIZACAO.md](GUIA_ESTILIZACAO.md)** - Guia de estilos do frontend
 
 ### Cálculo de Frete
 
